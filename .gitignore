@@ -6,11 +6,11 @@ obj/
 /CustomImages
 /APMPlannerXplanes/APMPlannerXplanes/Debug
 /APMPlannerXplanes/Debug
-/Driver/makecert.exe
-/Drivers/gencert.bat
-/Drivers/int2cat.bat
-/Drivers/makecert.exe
-/Drivers/signing.url
+Driver/makecert.exe
+Drivers/gencert.bat
+Drivers/int2cat.bat
+Drivers/makecert.exe
+Drivers/signing.url
 /Msi
 /packages
 *.psess
@@ -32,7 +32,7 @@ obj/
 /LogAnalyzer/py2exe/build
 /LogAnalyzer/LogAnalyzer64.zip
 /gstream
-/MissionPlanner.appx
+MissionPlanner.appx
 /AltitudeAngelWings.sln
 /appxkey.cer
 /ExtLibs/Portable/Portable

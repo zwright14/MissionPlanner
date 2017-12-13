@@ -33,6 +33,7 @@
   <ItemGroup>
     <Compile Remove="APMPlannerXplanes\**" />
     <Compile Remove="ExtLibs\**" />
+    <Compile Remove="LogAnalyzer\**" />
     <Compile Remove="Msi\**" />
     <Compile Remove="Plugins\**" />
     <Compile Remove="resedit\**" />
@@ -41,6 +42,7 @@
     <Compile Remove="wix\**" />
     <EmbeddedResource Remove="APMPlannerXplanes\**" />
     <EmbeddedResource Remove="ExtLibs\**" />
+    <EmbeddedResource Remove="LogAnalyzer\**" />
     <EmbeddedResource Remove="Msi\**" />
     <EmbeddedResource Remove="Plugins\**" />
     <EmbeddedResource Remove="resedit\**" />
@@ -49,6 +51,7 @@
     <EmbeddedResource Remove="wix\**" />
     <None Remove="APMPlannerXplanes\**" />
     <None Remove="ExtLibs\**" />
+    <None Remove="LogAnalyzer\**" />
     <None Remove="Msi\**" />
     <None Remove="Plugins\**" />
     <None Remove="resedit\**" />
@@ -61,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="BitMiracle.LibTiff.NetStandard">
-      <HintPath>..\..\..\.nuget\packages\bitmiracle.libtiff.net\2.4.584.1\lib\netstandard1.3\BitMiracle.LibTiff.NetStandard.dll</HintPath>
+      <HintPath>..\..\..\..\.nuget\packages\bitmiracle.libtiff.net\2.4.584.1\lib\netstandard1.3\BitMiracle.LibTiff.NetStandard.dll</HintPath>
     </Reference>
     <Reference Include="csmatio">
       <HintPath>packages\CSMatIO.1.0.2\lib\net40\csmatio.dll</HintPath>
@@ -124,11 +127,11 @@
     </Reference>
     <Reference Include="OpenTK">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>ExtLibs\OpenTK.dll</HintPath>
+      <HintPath>..\ExtLibs\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.GLControl">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>ExtLibs\OpenTK.GLControl.dll</HintPath>
+      <HintPath>..\ExtLibs\OpenTK.GLControl.dll</HintPath>
     </Reference>
     <Reference Include="osr_csharp">
       <HintPath>packages\GDAL.1.11.1\lib\net40\osr_csharp.dll</HintPath>
@@ -226,7 +229,7 @@
     </Reference>
     <Reference Include="System.Speech">
       <Private>True</Private>
-      <HintPath>ExtLibs\System.Speech.dll</HintPath>
+      <HintPath>..\ExtLibs\System.Speech.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -244,7 +247,7 @@
     </Reference>
     <Reference Include="Transitions">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>ExtLibs\Transitions.dll</HintPath>
+      <HintPath>..\ExtLibs\Transitions.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="Xamarin.Forms.Core">
@@ -348,29 +351,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\Parachute.png" />
-    <Content Include="LogAnalyzer\py2exe\DataflashLog.py" />
-    <Content Include="LogAnalyzer\py2exe\example_output.xml" />
-    <Content Include="LogAnalyzer\py2exe\LogAnalyzer.py" />
-    <Content Include="LogAnalyzer\py2exe\runner.py" />
-    <Content Include="LogAnalyzer\py2exe\setup.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestAutotune.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestBrownout.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestCompass.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestDualGyroDrift.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestDupeLogData.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestEmpty.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestEvents.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestGPSGlitch.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestIMUMatch.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestMotorBalance.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestParams.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestPerformance.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestPitchRollCoupling.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestThrust.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestVCC.py" />
-    <Content Include="LogAnalyzer\py2exe\tests\TestVibration.py" />
-    <Content Include="LogAnalyzer\py2exe\UnitTest.py" />
-    <Content Include="LogAnalyzer\py2exe\VehicleType.py" />
     <Content Include="mavgraphs.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -677,100 +657,100 @@
     <EmbeddedResource Include="Resources\up.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="ExtLibs\AltitudeAngelWings\AltitudeAngelWings.csproj">
+    <ProjectReference Include="..\ExtLibs\AltitudeAngelWings\AltitudeAngelWings.csproj">
       <Project>{098f542c-7c70-4b9c-b2e2-ac5dc5e0294b}</Project>
       <Name>AltitudeAngelWings</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\Arduino\Arduino.csproj">
+    <ProjectReference Include="..\ExtLibs\Arduino\Arduino.csproj">
       <Project>{DFA3C3B7-F098-4567-A780-A37DC52CA577}</Project>
       <Name>Arduino</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\AviFile\AviFile.csproj">
+    <ProjectReference Include="..\ExtLibs\AviFile\AviFile.csproj">
       <Project>{ABB32A29-AF50-47FA-B243-5FD75A5ABA54}</Project>
       <Name>AviFile</Name>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\BSE.Windows.Forms\BSE.Windows.Forms.csproj">
+    <ProjectReference Include="..\ExtLibs\BSE.Windows.Forms\BSE.Windows.Forms.csproj">
       <Project>{9ca367b8-0b98-49d1-84fb-735e612e3ba9}</Project>
       <Name>BSE.Windows.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\Comms\MissionPlanner.Comms.csproj">
+    <ProjectReference Include="..\ExtLibs\Comms\MissionPlanner.Comms.csproj">
       <Project>{825E7A10-390C-4A2B-B3A8-491D14966912}</Project>
       <Name>MissionPlanner.Comms</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\Controls\MissionPlanner.Controls.csproj">
+    <ProjectReference Include="..\ExtLibs\Controls\MissionPlanner.Controls.csproj">
       <Project>{C8B88795-6D01-494D-83AD-6944BD4C5023}</Project>
       <Name>MissionPlanner.Controls</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\Core\Core.csproj">
+    <ProjectReference Include="..\ExtLibs\Core\Core.csproj">
       <Project>{59129078-7B12-4198-B93E-0AA08D0BB7ED}</Project>
       <Name>Core</Name>
       <Private>true</Private>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\GDAL\GDAL.NET.csproj" />
-    <ProjectReference Include="ExtLibs\GeoUtility\GeoUtility.csproj">
+    <ProjectReference Include="..\ExtLibs\GDAL\GDAL.NET.csproj" />
+    <ProjectReference Include="..\ExtLibs\GeoUtility\GeoUtility.csproj">
       <Project>{7F7994CE-823F-4A04-BBEA-D0A3808FF56D}</Project>
       <Name>GeoUtility</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\GMap.NET.Core\GMap.NET.Core.csproj">
+    <ProjectReference Include="..\ExtLibs\GMap.NET.Core\GMap.NET.Core.csproj">
       <Project>{d0c39d9d-bed0-418b-9a5e-713176caf40c}</Project>
       <Name>GMap.NET.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj">
+    <ProjectReference Include="..\ExtLibs\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj">
       <Project>{e06def77-f933-42fb-afd7-db2d0d8d6a98}</Project>
       <Name>GMap.NET.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\KMLib\KMLib.csproj">
+    <ProjectReference Include="..\ExtLibs\KMLib\KMLib.csproj">
       <Project>{29976BA4-A04D-4A80-A866-098C879C2FDE}</Project>
       <Name>KMLib</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\LibVLC.NET\LibVLC.NET.csproj">
+    <ProjectReference Include="..\ExtLibs\LibVLC.NET\LibVLC.NET.csproj">
       <Project>{bb06dff7-4f41-4b9d-a3c3-3b6d2b8702b6}</Project>
       <Name>LibVLC.NET</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\ManagedNativeWifi.Simple\ManagedNativeWifi.Simple.csproj">
+    <ProjectReference Include="..\ExtLibs\ManagedNativeWifi.Simple\ManagedNativeWifi.Simple.csproj">
       <Project>{cce510f7-1da6-40f2-8921-b86ed41bb85e}</Project>
       <Name>ManagedNativeWifi.Simple</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\Mavlink\MAVLink.csproj">
+    <ProjectReference Include="..\ExtLibs\Mavlink\MAVLink.csproj">
       <Project>{13d2ec90-c41f-48a1-aada-859b6dc24edc}</Project>
       <Name>MAVLink</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\MetaDataExtractorCSharp240d\MetaDataExtractor.csproj">
+    <ProjectReference Include="..\ExtLibs\MetaDataExtractorCSharp240d\MetaDataExtractor.csproj">
       <Project>{B46F6C6C-9184-41AF-8F8B-E0084752CA7C}</Project>
       <Name>MetaDataExtractor</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\px4uploader\px4uploader.csproj">
+    <ProjectReference Include="..\ExtLibs\px4uploader\px4uploader.csproj">
       <Project>{664FC484-2A94-4B0D-808F-A71F88E06B11}</Project>
       <Name>px4uploader</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\SharpAdbClient\SharpAdbClient.csproj">
+    <ProjectReference Include="..\ExtLibs\SharpAdbClient\SharpAdbClient.csproj">
       <Project>{65473257-e70f-410b-9269-d0c0f771ea87}</Project>
       <Name>SharpAdbClient</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\SharpKml\SharpKml.csproj">
+    <ProjectReference Include="..\ExtLibs\SharpKml\SharpKml.csproj">
       <Project>{53F12A60-E9CC-44BC-8366-1AE3AB2B547D}</Project>
       <Name>SharpKml</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\solo\solo.csproj">
+    <ProjectReference Include="..\ExtLibs\solo\solo.csproj">
       <Project>{cf402948-a3f4-4962-8a57-e40b46759d25}</Project>
       <Name>solo</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\tlogThumbnailHandler\tlogThumbnailHandler.csproj">
+    <ProjectReference Include="..\ExtLibs\tlogThumbnailHandler\tlogThumbnailHandler.csproj">
       <Project>{aba78b2e-77c3-4377-8568-9542ac227971}</Project>
       <Name>tlogThumbnailHandler</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\Utilities\MissionPlanner.Utilities.csproj">
+    <ProjectReference Include="..\ExtLibs\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378A66C-38E4-46F5-A05F-DC04EF7D4D16}</Project>
       <Name>MissionPlanner.Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\ZedGraph\ZedGraph.csproj">
+    <ProjectReference Include="..\ExtLibs\ZedGraph\ZedGraph.csproj">
       <Project>{2541686B-1673-43BF-AF89-3163945DB009}</Project>
       <Name>ZedGraph</Name>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\Zeroconf\Zeroconf\Zeroconf.csproj" />
-    <ProjectReference Include="Updater\Updater.csproj" />
+    <ProjectReference Include="..\ExtLibs\Zeroconf\Zeroconf\Zeroconf.csproj" />
+    <ProjectReference Include="..\Updater\Updater.csproj" />
   </ItemGroup>
  
    <ItemGroup>
@@ -3805,8 +3785,6 @@
     <None Update="Lib.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="LogAnalyzer\py2exe\createexe.bat" />
-    <None Include="LogAnalyzer\upload.bat" />
     <None Include="NoFly\Areas-Lisboa.kmz" />
     <None Update="NoFly\Regulamento-RPA-ver-3.0.kmz">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
