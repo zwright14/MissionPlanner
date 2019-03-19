@@ -11,6 +11,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\..\Controls\MavlinkCheckBox.cs" Link="Linked\MavlinkCheckBox.cs" />
+    <Compile Include="..\..\..\Controls\MavlinkCheckBoxBitMask.cs" Link="Linked\MavlinkCheckBoxBitMask.cs" />
+    <Compile Include="..\..\..\Controls\MavlinkComboBox.cs" Link="Linked\MavlinkComboBox.cs" />
+    <Compile Include="..\..\..\Controls\MavlinkNumericUpDown.cs" Link="Linked\MavlinkNumericUpDown.cs" />
+    <Compile Include="..\..\..\Controls\MAVLinkParamChanged.cs" Link="Linked\MAVLinkParamChanged.cs" />
+    <Compile Include="..\..\..\GCSViews\ConfigurationView\ConfigArducopter.cs" Link="Linked\ConfigArducopter.cs" />
+    <Compile Include="..\..\..\GCSViews\ConfigurationView\ConfigArducopter.Designer.cs" Link="Linked\ConfigArducopter.Designer.cs" />
+    <Compile Include="..\..\Controls\ControlExt.cs" Link="Linked\ControlExt.cs" />
+    <Compile Include="..\..\Controls\IActivate.cs" Link="Linked\IActivate.cs" />
+    <Compile Include="..\..\Controls\IDynamicParameterControl.cs" Link="Linked\IDynamicParameterControl.cs" />
+    <Compile Include="..\..\Controls\MyButton.cs" Link="Linked\MyButton.cs" />
+    <Compile Include="..\..\Controls\MyLabel.cs" Link="Linked\MyLabel.cs" />
+    <Compile Include="..\..\Controls\MyUserControl.cs" Link="Linked\MyUserControl.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\Controls\MavlinkCheckBoxBitMask.resx" Link="Linked\MavlinkCheckBoxBitMask.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.1" />
     <PackageReference Include="SkiaSharp.Views.Forms" Version="1.68.0" />
   </ItemGroup>
@@ -19,6 +39,7 @@
     <ProjectReference Include="..\..\ArduPilot\MissionPlanner.ArduPilot.csproj" />
     <ProjectReference Include="..\..\Comms\MissionPlanner.Comms.csproj" />
     <ProjectReference Include="..\..\Mavlink\MAVLink.csproj" />
+    <ProjectReference Include="..\..\mono\mcs\class\System.Windows.Forms\System.Windows.Forms-net_4_x.csproj" />
     <ProjectReference Include="..\..\UAVCAN\UAVCAN.csproj" />
     <ProjectReference Include="..\..\Utilities\MissionPlanner.Utilities.csproj" />
   </ItemGroup>
@@ -41,6 +62,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="ConfigUAVCAN.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="MasterDetailPage1Detail.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>

@@ -148,6 +148,10 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.1.9" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\mono\mcs\class\System.Windows.Forms\System.Windows.Forms-net_4_x.csproj">
+      <Project>{f8d1fb51-2add-4bcb-a243-9980d5f2f2e5}</Project>
+      <Name>System.Windows.Forms-net_4_x</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Xamarin\Xamarin.csproj" NoWarn="NU1201">
       <Project>{046987C6-A43A-45E6-AD0B-45F1A43005D0}</Project>
       <Name>Xamarin</Name>

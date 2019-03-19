@@ -77,7 +77,15 @@ namespace Xamarin
             Container = builder.Build();
 
             var scope = Container.BeginLifetimeScope();
-            
+
+            var test = scope.Resolve<ICommsSerial>();
+
+
+            Task.Run(() =>
+            {
+                
+
+            });
         }
 
         private CustomMessageBox.DialogResult CustomMessageBox_ShowEvent(string text, string caption = "", CustomMessageBox.MessageBoxButtons buttons = CustomMessageBox.MessageBoxButtons.OK, CustomMessageBox.MessageBoxIcon icon = CustomMessageBox.MessageBoxIcon.None)

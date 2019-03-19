@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MissionPlanner.Utilities
+namespace MissionPlanner
 {
     internal class MainV2
     {
