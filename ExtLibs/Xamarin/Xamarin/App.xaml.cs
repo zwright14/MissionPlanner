@@ -80,10 +80,10 @@ namespace Xamarin
 
             var test = scope.Resolve<ICommsSerial>();
 
+            var test2 = Container.Resolve<ICommsSerial>();
 
             Task.Run(() =>
             {
-                
 
             });
         }
@@ -151,13 +151,29 @@ namespace Xamarin
                                 Thread.Sleep(20);
 
                             var packet = mav.readPacket();
-
-                            mav.MAV.cs.UpdateCurrentSettings(null);
                         }
                         catch (Exception ex)
                         {
                             Log.Warning("", ex.ToString());
                             Thread.Sleep(10);
+                        }
+                    }
+                });
+
+                Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            if (mav != null)
+                                if (mav.MAV != null)
+                                    mav.MAV.cs.UpdateCurrentSettings(null);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warning("", ex.ToString());
+                            Thread.Sleep(100);
                         }
                     }
                 });

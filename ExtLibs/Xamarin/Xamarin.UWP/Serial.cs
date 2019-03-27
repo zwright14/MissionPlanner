@@ -7,10 +7,11 @@ using Windows.Devices.SerialCommunication;
 using Windows.Devices.Enumeration;
 using System.IO;
 using System.IO.Ports;
+using MissionPlanner.Comms;
 
 namespace Xamarin.UWP
 {
-    public class Serial
+    public class Serial: ICommsSerial
     {
 
         public Serial()

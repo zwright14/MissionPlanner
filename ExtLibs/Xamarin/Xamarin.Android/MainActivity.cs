@@ -20,7 +20,7 @@ namespace Xamarin.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
-            App.builder.RegisterType(typeof(Serial)).As<ICommsSerial>();
+            Xamarin.App.builder.RegisterType<Serial>().As<ICommsSerial>();
 
             base.OnCreate(savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);

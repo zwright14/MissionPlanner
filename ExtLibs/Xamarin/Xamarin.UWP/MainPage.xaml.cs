@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using MissionPlanner.Comms;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +23,7 @@ namespace Xamarin.UWP
         {
             this.InitializeComponent();
 
-            //Xamarin.App.builder.RegisterInstance(new Serial()).As<ICommsSerial>();
+            Xamarin.App.builder.RegisterType<Serial>().As<ICommsSerial>();
 
             LoadApplication(new Xamarin.App());
 

@@ -12,15 +12,8 @@ using Hoho.Android.UsbSerial.Driver;
 
 namespace Xamarin.Android
 {
-    public class Serial : CdcAcmSerialDriver.CdcAcmSerialPort, ICommsSerial, IUsbSerialPort
+    public class Serial : CdcAcmSerialDriver, ICommsSerial
     {
-        protected Serial(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-        {
-        }
-
-        public Serial(CdcAcmSerialDriver usbManager, UsbDevice usbDevice, int portNumber) : base(usbManager, usbDevice, portNumber)
-        {
-        }
 
         class instream: Stream
         {
@@ -191,6 +184,14 @@ namespace Xamarin.Android
         public void toggleDTR()
         {
             
+        }
+
+        protected Serial(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+        {
+        }
+
+        public Serial(UsbDevice p0) : base(p0)
+        {
         }
     }
 }
