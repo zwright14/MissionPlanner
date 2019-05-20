@@ -1,6 +1,6 @@
-MainPackage=C:\Users\michael\Source\Repos\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Release\WindowsStore_0.0.50.0_AnyCPU.appx
-SymbolPackage=C:\Users\michael\Source\Repos\MissionPlanner\ExtLibs\WindowsStore\AppPackages\WindowsStore_0.0.50.0_Test\WindowsStore_0.0.50.0_AnyCPU.appxsym
-ResourcePack=C:\Users\michael\Source\Repos\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Release\WindowsStore_0.0.50.0_scale-100.appx
-ResourcePack=C:\Users\michael\Source\Repos\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Release\WindowsStore_0.0.50.0_scale-125.appx
-ResourcePack=C:\Users\michael\Source\Repos\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Release\WindowsStore_0.0.50.0_scale-150.appx
-ResourcePack=C:\Users\michael\Source\Repos\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Release\WindowsStore_0.0.50.0_scale-400.appx
+MainPackage=C:\Users\mich1\Desktop\Hex\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Debug\WindowsStore_1.3.66.0_AnyCPU_Debug.appx
+SymbolPackage=C:\Users\mich1\Desktop\Hex\MissionPlanner\ExtLibs\WindowsStore\AppPackages\WindowsStore_1.3.66.0_Debug_Test\WindowsStore_1.3.66.0_AnyCPU_Debug.appxsym
+ResourcePack=C:\Users\mich1\Desktop\Hex\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Debug\WindowsStore_1.3.66.0_scale-100.appx
+ResourcePack=C:\Users\mich1\Desktop\Hex\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Debug\WindowsStore_1.3.66.0_scale-125.appx
+ResourcePack=C:\Users\mich1\Desktop\Hex\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Debug\WindowsStore_1.3.66.0_scale-150.appx
+ResourcePack=C:\Users\mich1\Desktop\Hex\MissionPlanner\ExtLibs\WindowsStore\bin\AnyCPU\Debug\WindowsStore_1.3.66.0_scale-400.appx

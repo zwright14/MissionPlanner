@@ -3,7 +3,7 @@ using MissionPlanner.Utilities.Drawing;
 
 namespace Xamarin.Controls
 {
-    public class MouseEventArgs : EventArgs
+    public class MouseEventArgs1 : EventArgs
     {
         public int X { get; set; }
         public int Y { get; set; }

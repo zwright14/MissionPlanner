@@ -1,12 +1,16 @@
 ﻿
+using System.Windows.Forms;
 using ExifLibrary;
 using MissionPlanner.Utilities;
 using MissionPlanner.Utilities.Drawing;
 using OpenTK.Graphics;
 using OpenTK.Platform;
 using SkiaSharp;
-using Xamarin.Controls;
+using static MissionPlanner.Utilities.Drawing.ControlStyles;
 using Color = System.Drawing.Color;
+using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+using Keys = System.Windows.Forms.Keys;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 using Rectangle = System.Drawing.Rectangle;
 using PointF = System.Drawing.PointF;
 using RectangleF = System.Drawing.RectangleF;
@@ -38,7 +42,7 @@ namespace GMap.NET.WindowsForms
     /// <summary>
     /// GMap.NET control for Windows Forms
     /// </summary>   
-    public partial class GMapControl : MySKGLView, Interface
+    public partial class GMapControl : UserControl, Interface
    {
 #if !PocketPC
       /// <summary>
@@ -542,11 +546,12 @@ namespace GMap.NET.WindowsForms
 #endif
           {
 #if !PocketPC
-              this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-              this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-              this.SetStyle(ControlStyles.UserPaint, true);
-              this.SetStyle(ControlStyles.Opaque, true);
-              ResizeRedraw = true;
+              /*
+              this.SetStyle(OptimizedDoubleBuffer, true);
+              this.SetStyle(AllPaintingInWmPaint, true);
+              this.SetStyle(UserPaint, true);
+              this.SetStyle(Opaque, true);
+              */ResizeRedraw = true;
 
               TileFlipXYAttributes.SetWrapMode(WrapMode.TileFlipXY);
 
@@ -1631,7 +1636,7 @@ namespace GMap.NET.WindowsForms
             g.FillRectangle(SelectedAreaFill, x1, y1, x2 - x1, y2 - y1);
          }
 
-         if(renderHelperLine)
+         if(true)
          {
             var p = PointToClient(Form.MousePosition);
 
@@ -1797,7 +1802,7 @@ namespace GMap.NET.WindowsForms
          if(!IsMouseOverMarker)
          {
 #if !PocketPC
-            if(e.Button == DragButton && CanDragMap)
+            if(e.Button == (System.Windows.Forms.MouseButtons) DragButton && CanDragMap)
 #else
             if(CanDragMap)
 #endif
@@ -1854,7 +1859,7 @@ namespace GMap.NET.WindowsForms
          else
          {
 #if !PocketPC
-            if(e.Button == DragButton)
+            if(e.Button == (System.Windows.Forms.MouseButtons) DragButton)
             {
                Core.mouseDown = GPoint.Empty;
             }
@@ -1863,7 +1868,7 @@ namespace GMap.NET.WindowsForms
             {
                bool zoomtofit = false;
 
-               if(!SelectedArea.IsEmpty && Form.ModifierKeys == Keys.Shift)
+               if(!SelectedArea.IsEmpty && Form.ModifierKeys == (System.Windows.Forms.Keys) Keys.Shift)
                {
                   zoomtofit = SetZoomToFitRect(SelectedArea);
                }
@@ -2075,7 +2080,7 @@ namespace GMap.NET.WindowsForms
          else
          {
 #if !PocketPC
-            if(isSelected && !selectionStart.IsEmpty && (Form.ModifierKeys == Keys.Alt || Form.ModifierKeys == Keys.Shift || DisableAltForSelection))
+            if(isSelected && !selectionStart.IsEmpty && (Form.ModifierKeys == (System.Windows.Forms.Keys) Keys.Alt || Form.ModifierKeys == (System.Windows.Forms.Keys) Keys.Shift || DisableAltForSelection))
             {
                selectionEnd = FromLocalToLatLng(e.X, e.Y);
                {

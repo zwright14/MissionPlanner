@@ -1,140 +1,138 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Collections;
-using System.ComponentModel;
-using System.Globalization;
-using System.Reflection;
-using System.Resources;
-using System.Threading;
-using log4net;
-using Xamarin.Controls;
+﻿using log4net;
 using MissionPlanner.Utilities.Drawing;
-using SkiaSharp;
-using Color = System.Drawing.Color ;
-using Rectangle = System.Drawing.Rectangle;
-using PointF = System.Drawing.PointF;
-using RectangleF = System.Drawing.RectangleF;
-using Point = System.Drawing.Point;
-using Graphics = MissionPlanner.Utilities.Drawing.Graphics;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+using OpenTK.Graphics.ES31;
+using Xamarin.Controls;
+using ClearBufferMask = OpenTK.Graphics.ES20.ClearBufferMask;
+using Cursor = System.Windows.Forms.Cursor;
+using Cursors = System.Windows.Forms.Cursors;
+using EnableCap = OpenTK.Graphics.ES20.EnableCap;
+using GL = OpenTK.Graphics.ES20.GL;
+using PaintEventArgs = System.Windows.Forms.PaintEventArgs;
+using PixelFormat = MissionPlanner.Utilities.Drawing.PixelFormat;
+using PixelInternalFormat = OpenTK.Graphics.ES20.PixelInternalFormat;
+using PixelType = OpenTK.Graphics.ES20.PixelType;
+using StencilFunction = OpenTK.Graphics.ES20.StencilFunction;
+using StencilOp = OpenTK.Graphics.ES20.StencilOp;
+using TextureMagFilter = OpenTK.Graphics.ES20.TextureMagFilter;
+using TextureMinFilter = OpenTK.Graphics.ES20.TextureMinFilter;
+using TextureParameterName = OpenTK.Graphics.ES20.TextureParameterName;
+using TextureTarget = OpenTK.Graphics.ES20.TextureTarget;
+using TextureWrapMode = OpenTK.Graphics.ES20.TextureWrapMode;
+
+
+// Control written by Michael Oborne 2011
+// dual opengl and GDI+
 
 namespace MissionPlanner.Controls
 {
-    public class HUD : MySKGLView
+    public class HUD : UserControl
     {
-        public Hashtable CustomItems = new Hashtable();
+        private static readonly ILog log =
+            LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public bool HoldInvalidation = false;
+        private object paintlock = new object();
+        private object streamlock = new object();
 
-        public int huddrawtime = 0;
+        private MemoryStream _streamjpg = new MemoryStream();
 
-     
-        public bool SixteenXNine = false;
+        //[System.ComponentModel.Browsable(false)]
+        public MemoryStream streamjpg
+        {
+            get
+            {
+                lock (streamlock)
+                {
+                    return _streamjpg;
+                }
+            }
+            set
+            {
+                lock (streamlock)
+                {
+                    _streamjpg = value;
+                }
+            }
+        }
+
+        private DateTime textureResetDateTime = DateTime.Now;
 
         /// <summary>
         /// this is to reduce cpu usage
         /// </summary>
         public bool streamjpgenable = false;
 
-        const double deg2rad = (1.0 / rad2deg);
+        public bool HoldInvalidation = false;
 
-        const double rad2deg = (180 / Math.PI);
+        public bool Russian { get; set; }
 
-        private static readonly SolidBrush AltGroundBrush = new SolidBrush(Color.FromArgb(100, Color.BurlyWood));
+        private class character
+        {
+            public GraphicsPath pth;
+            public Bitmap bitmap;
+            public int gltextureid;
+            public int width;
+            public int size;
+        }
 
-        private static readonly ILog log =
-                                                                                    LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        private static readonly SolidBrush SlightlyTransparentWhiteBrush =
-            new SolidBrush(Color.FromArgb(220, 255, 255, 255));
-
-        private static readonly SolidBrush SolidBrush = new SolidBrush(Color.FromArgb(0x55, 0xff, 0xff, 0xff));
-        private readonly object _bgimagelock = new object();
-        private readonly Pen _blackPen = new Pen(Color.Black, 2);
-        private readonly Pen _greenPen = new Pen(Color.Green, 2);
-        /// <summary>
-        /// pen for drawstring
-        /// </summary>
-        private readonly Pen _p = new Pen(Color.FromArgb(0x26, 0x27, 0x28), 2f);
-
-        private readonly Pen _redPen = new Pen(Color.Red, 2);
-        private readonly SolidBrush _whiteBrush = new SolidBrush(Color.White);
-        /// <summary>
-        /// pth for drawstring
-        /// </summary>
-        private readonly GraphicsPath pth = new GraphicsPath();
-
-        private float _airspeed = 0;
-        private float _alt = 0;
-        float _AOA = 0;
-        private float _batterylevel = 0;
-        private float _batteryremaining = 0;
-        private Image _bgimage;
-        float _critAOA = 25;
-        float _critSSA = 30;
-        private float _current = 0;
-        private DateTime _datetime;
-        private float _disttowp = 0;
-        private float _gpsfix = 0;
-        private float _gpsfix2 = 0;
-        private float _gpshdop = 0;
-        private float _gpshdop2 = 0;
-        float _greenSSAp = 10;
-        private Color _groundColor1 = Color.FromArgb(0x9b, 0xb8, 0x24);
-        private Color _groundColor2 = Color.FromArgb(0x41, 0x4f, 0x07);
-        private float _groundcourse = 0;
-        private float _groundspeed = 0;
-        private float _heading = 0;
-        private Color _hudcolor = Color.White;
-        private float _linkqualitygcs = 0;
-        private bool _lowairspeed = false;
-        private bool _lowgroundspeed = false;
-        private string _mode = "Manual";
-        private float _navpitch = 0;
-        private float _navroll = 0;
-        private float _pitch = 0;
-        float _redSSAp = 90;
-        private float _roll = 0;
-        private Color _skyColor1 = Color.Blue;
-        private Color _skyColor2 = Color.LightBlue;
-        float _SSA = 0;
-        private MemoryStream _streamjpg = new MemoryStream();
-        private float _targetalt = 0;
-        private float _targetheading = 0;
-        private float _targetspeed = 0;
-        private character[] _texture = new character[2];
-        private float _turnrate = 0;
-        private float _verticalspeed = 0;
-        private Pen _whitePen = new Pen(Color.White, 2);
-        private int _wpno = 0;
-        private float _xtrack_error = 0;
-        float _yellowSSAp = 60;
-        private DateTime armedtimer = DateTime.MinValue;
         private Dictionary<int, character> charDict = new Dictionary<int, character>();
-        private int count = 0;
-        private DateTime countdate = DateTime.Now;
-        Rectangle ekfhitzone = new Rectangle();
-        // move these global as they rarely change - reduce GC
-        private Font font = new Font(HUDT.Font, 10);
 
-        private Utilities.Drawing.IGraphics graphicsObject;
-        bool inOnPaint = false;
-        DateTime lastinvalidate = DateTime.MinValue;
-        string otherthread = "";
-        private object paintlock = new object();
-        private System.ComponentModel.ComponentResourceManager resources =
-            new System.ComponentModel.ComponentResourceManager(typeof(HUD));
+        public int huddrawtime = 0;
 
+        [DefaultValue(true)] public bool opengl { get; set; }
+
+        [Browsable(false)] public bool npotSupported { get; private set; }
+
+        public bool SixteenXNine = false;
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayheading { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayspeed { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayalt { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayconninfo { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayxtrack { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayrollpitch { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displaygps { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool bgon { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool hudon { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool batteryon { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayekf { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayvibe { get; set; }
+
+        [System.ComponentModel.Browsable(true), DefaultValue(true)]
+        public bool displayAOASSA { get; set; }
+
+ 
         private bool started = false;
-        private DateTime starttime = DateTime.MinValue;
-        private bool statuslast = false;
-        private object streamlock = new object();
-        private DateTime textureResetDateTime = DateTime.Now;
 
-        Rectangle vibehitzone = new Rectangle();
-
-        //      private static ImageCodecInfo ici = GetImageCodec("image/jpeg");
-        //      private static EncoderParameters eps = new EncoderParameters(1);
         public HUD()
         {
             opengl =
@@ -145,15 +143,187 @@ namespace MissionPlanner.Controls
                                 displayalt =
                                     displayconninfo =
                                         displayxtrack = displayrollpitch = displaygps = bgon = hudon = batteryon = true;
-
+            opengl = false;
             displayAOASSA = false;
 
             this.Name = "Hud";
+
+
+            objBitmap.MakeTransparent();
+
+            graphicsObject = this;
+            graphicsObjectGDIP = Graphics.FromImage(objBitmap);
         }
 
-        public event EventHandler ekfclick;
+        private float _roll = 0;
+        private float _navroll = 0;
+        private float _pitch = 0;
+        private float _navpitch = 0;
+        private float _heading = 0;
+        private float _targetheading = 0;
+        private float _alt = 0;
+        private float _targetalt = 0;
+        private float _groundspeed = 0;
+        private float _airspeed = 0;
+        private bool _lowgroundspeed = false;
+        private bool _lowairspeed = false;
+        private float _targetspeed = 0;
+        private float _batterylevel = 0;
+        private float _current = 0;
+        private float _batteryremaining = 0;
+        private float _gpsfix = 0;
+        private float _gpshdop = 0;
+        private float _gpsfix2 = 0;
+        private float _gpshdop2 = 0;
+        private float _disttowp = 0;
+        private float _groundcourse = 0;
+        private float _xtrack_error = 0;
+        private float _turnrate = 0;
+        private float _verticalspeed = 0;
+        private float _linkqualitygcs = 0;
+        private DateTime _datetime;
+        private string _mode = "Manual";
+        private int _wpno = 0;
 
-        public event EventHandler vibeclick;
+        float _AOA = 0;
+        float _SSA = 0;
+        float _critAOA = 25;
+        float _critSSA = 30;
+        float _redSSAp = 90;
+        float _yellowSSAp = 60;
+        float _greenSSAp = 10;
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float roll
+        {
+            get { return _roll; }
+            set
+            {
+                if (_roll != value)
+                {
+                    _roll = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float navroll
+        {
+            get { return _navroll; }
+            set
+            {
+                if (_navroll != value)
+                {
+                    _navroll = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float pitch
+        {
+            get { return _pitch; }
+            set
+            {
+                if (_pitch != value)
+                {
+                    _pitch = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float navpitch
+        {
+            get { return _navpitch; }
+            set
+            {
+                if (_navpitch != value)
+                {
+                    _navpitch = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float heading
+        {
+            get { return _heading; }
+            set
+            {
+                if (_heading != value)
+                {
+                    _heading = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float targetheading
+        {
+            get { return _targetheading; }
+            set
+            {
+                if (_targetheading != value)
+                {
+                    _targetheading = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        public string distunit { get; set; }
+
+        public string speedunit { get; set; }
+
+        public string altunit { get; set; }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float alt
+        {
+            get { return _alt; }
+            set
+            {
+                if (_alt != value)
+                {
+                    _alt = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float targetalt
+        {
+            get { return _targetalt; }
+            set
+            {
+                if (_targetalt != value)
+                {
+                    _targetalt = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float groundspeed
+        {
+            get { return _groundspeed; }
+            set
+            {
+                if (_groundspeed != value)
+                {
+                    _groundspeed = value;
+                    this.Invalidate();
+                }
+            }
+        }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
         public float airspeed
@@ -170,31 +340,42 @@ namespace MissionPlanner.Controls
         }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float alt
+        public bool lowgroundspeed
         {
-            get { return _alt; }
+            get { return _lowgroundspeed; }
             set
             {
-                if (_alt != value)
+                if (_lowgroundspeed != value)
                 {
-                    _alt = value;
+                    _lowgroundspeed = value;
                     this.Invalidate();
                 }
             }
         }
 
-        public string altunit { get; set; }
-
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float AOA
+        public bool lowairspeed
         {
-            get { return _AOA; }
+            get { return _lowairspeed; }
             set
             {
-                if (_AOA != value)
+                if (_lowairspeed != value)
                 {
-                    _AOA = value;
-                    displayAOASSA = true;
+                    _lowairspeed = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float targetspeed
+        {
+            get { return _targetspeed; }
+            set
+            {
+                if (_targetspeed != value)
+                {
+                    _targetspeed = value;
                     this.Invalidate();
                 }
             }
@@ -214,9 +395,6 @@ namespace MissionPlanner.Controls
             }
         }
 
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool batteryon { get; set; }
-
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
         public float batteryremaining
         {
@@ -226,61 +404,6 @@ namespace MissionPlanner.Controls
                 if (_batteryremaining != value)
                 {
                     _batteryremaining = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        public Image bgimage
-        {
-            set
-            {
-                lock (this._bgimagelock)
-                {
-                    try
-                    {
-                        _bgimage = (Image)value;
-                    }
-                    catch
-                    {
-                        _bgimage = null;
-                    }
-
-                    this.Invalidate();
-                }
-            }
-            get { return _bgimage; }
-        }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool bgon { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public bool connected { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float critAOA
-        {
-            get { return _critAOA; }
-            set
-            {
-                if (_critAOA != value)
-                {
-                    _critAOA = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float critSSA
-        {
-            get { return _critSSA; }
-            set
-            {
-                if (_critSSA != value)
-                {
-                    _critSSA = value;
                     this.Invalidate();
                 }
             }
@@ -302,75 +425,6 @@ namespace MissionPlanner.Controls
         }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public DateTime datetime
-        {
-            get { return _datetime; }
-            set
-            {
-                if (_datetime.Hour == value.Hour && _datetime.Minute == value.Minute &&
-                    _datetime.Second == value.Second)
-                    return;
-                if (_datetime != value)
-                {
-                    _datetime = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayalt { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayAOASSA { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayconninfo { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayekf { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displaygps { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayheading { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayrollpitch { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayspeed { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayvibe { get; set; }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool displayxtrack { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float disttowp
-        {
-            get { return _disttowp; }
-            set
-            {
-                if (_disttowp != value)
-                {
-                    _disttowp = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        public string distunit { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float ekfstatus { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public bool failsafe { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
         public float gpsfix
         {
             get { return _gpsfix; }
@@ -379,20 +433,6 @@ namespace MissionPlanner.Controls
                 if (_gpsfix != value)
                 {
                     _gpsfix = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float gpsfix2
-        {
-            get { return _gpsfix2; }
-            set
-            {
-                if (_gpsfix2 != value)
-                {
-                    _gpsfix2 = value;
                     this.Invalidate();
                 }
             }
@@ -413,6 +453,20 @@ namespace MissionPlanner.Controls
         }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float gpsfix2
+        {
+            get { return _gpsfix2; }
+            set
+            {
+                if (_gpsfix2 != value)
+                {
+                    _gpsfix2 = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
         public float gpshdop2
         {
             get { return _gpshdop2; }
@@ -427,20 +481,45 @@ namespace MissionPlanner.Controls
         }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float groundalt { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values"), DefaultValue(typeof(Color), "0x9bb824")]
-        public Color groundColor1
+        public float disttowp
         {
-            get { return _groundColor1; }
-            set { _groundColor1 = value; }
+            get { return _disttowp; }
+            set
+            {
+                if (_disttowp != value)
+                {
+                    _disttowp = value;
+                    this.Invalidate();
+                }
+            }
         }
 
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values"), DefaultValue(typeof(Color), "0x414f07")]
-        public Color groundColor2
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public string mode
         {
-            get { return _groundColor2; }
-            set { _groundColor2 = value; }
+            get { return _mode; }
+            set
+            {
+                if (_mode != value)
+                {
+                    _mode = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public int wpno
+        {
+            get { return _wpno; }
+            set
+            {
+                if (_wpno != value)
+                {
+                    _wpno = value;
+                    this.Invalidate();
+                }
+            }
         }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
@@ -458,263 +537,14 @@ namespace MissionPlanner.Controls
         }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float groundspeed
+        public float xtrack_error
         {
-            get { return _groundspeed; }
+            get { return _xtrack_error; }
             set
             {
-                if (_groundspeed != value)
+                if (_xtrack_error != value)
                 {
-                    _groundspeed = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float heading
-        {
-            get { return _heading; }
-            set
-            {
-                if (_heading != value)
-                {
-                    _heading = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public Color hudcolor
-        {
-            get { return this._whitePen.Color; }
-            set
-            {
-                _hudcolor = value;
-                this._whitePen = new Pen(value, 2);
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), DefaultValue(true)]
-        public bool hudon { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float linkqualitygcs
-        {
-            get { return _linkqualitygcs; }
-            set
-            {
-                if (_linkqualitygcs != value)
-                {
-                    _linkqualitygcs = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public bool lowairspeed
-        {
-            get { return _lowairspeed; }
-            set
-            {
-                if (_lowairspeed != value)
-                {
-                    _lowairspeed = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public bool lowgroundspeed
-        {
-            get { return _lowgroundspeed; }
-            set
-            {
-                if (_lowgroundspeed != value)
-                {
-                    _lowgroundspeed = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public bool lowvoltagealert { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public string message { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public DateTime messagetime { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public string mode
-        {
-            get { return _mode; }
-            set
-            {
-                if (_mode != value)
-                {
-                    _mode = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float navpitch
-        {
-            get { return _navpitch; }
-            set
-            {
-                if (_navpitch != value)
-                {
-                    _navpitch = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float navroll
-        {
-            get { return _navroll; }
-            set
-            {
-                if (_navroll != value)
-                {
-                    _navroll = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [Browsable(false)] public bool npotSupported { get; private set; }
-
-        [DefaultValue(true)] public bool opengl { get; set; } = false;
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float pitch
-        {
-            get { return _pitch; }
-            set
-            {
-                if (_pitch != value)
-                {
-                    _pitch = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float roll
-        {
-            get { return _roll; }
-            set
-            {
-                if (_roll != value)
-                {
-                    _roll = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        public bool Russian { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public Color skyColor1
-        {
-            get { return _skyColor1; }
-            set { _skyColor1 = value; }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public Color skyColor2
-        {
-            get { return _skyColor2; }
-            set { _skyColor2 = value; }
-        }
-
-        public string speedunit { get; set; }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float SSA
-        {
-            get { return _SSA; }
-            set
-            {
-                if (_SSA != value)
-                {
-                    _SSA = value;
-                    displayAOASSA = true;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public bool status { get; set; }
-
-        //[System.ComponentModel.Browsable(false)]
-        public MemoryStream streamjpg
-        {
-            get
-            {
-                lock (streamlock)
-                {
-                    return _streamjpg;
-                }
-            }
-            set
-            {
-                lock (streamlock)
-                {
-                    _streamjpg = value;
-                }
-            }
-        }
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float targetalt
-        {
-            get { return _targetalt; }
-            set
-            {
-                if (_targetalt != value)
-                {
-                    _targetalt = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float targetheading
-        {
-            get { return _targetheading; }
-            set
-            {
-                if (_targetheading != value)
-                {
-                    _targetheading = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float targetspeed
-        {
-            get { return _targetspeed; }
-            set
-            {
-                if (_targetspeed != value)
-                {
-                    _targetspeed = value;
+                    _xtrack_error = value;
                     this.Invalidate();
                 }
             }
@@ -742,11 +572,63 @@ namespace MissionPlanner.Controls
             {
                 if (_verticalspeed != Math.Round(value, 1))
                 {
-                    _verticalspeed = (float)Math.Round(value, 1);
+                    _verticalspeed = (float) Math.Round(value, 1);
                     this.Invalidate();
                 }
             }
         }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float linkqualitygcs
+        {
+            get { return _linkqualitygcs; }
+            set
+            {
+                if (_linkqualitygcs != value)
+                {
+                    _linkqualitygcs = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public DateTime datetime
+        {
+            get { return _datetime; }
+            set
+            {
+                if (_datetime.Hour == value.Hour && _datetime.Minute == value.Minute &&
+                    _datetime.Second == value.Second)
+                    return;
+                if (_datetime != value)
+                {
+                    _datetime = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public bool failsafe { get; set; }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public bool lowvoltagealert { get; set; }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public bool connected { get; set; }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float groundalt { get; set; }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public bool status { get; set; }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public string message { get; set; }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public DateTime messagetime { get; set; }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
         public float vibex { get; set; }
@@ -757,66 +639,214 @@ namespace MissionPlanner.Controls
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
         public float vibez { get; set; }
 
-        [Browsable(false)]
-        public new bool VSync
-        {
-            get
-            {
-                try
-                {
-                    return base.VSync;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-            set
-            {
-                try
-                {
-                    base.VSync = value;
-                }
-                catch
-                {
-                }
-            }
-        }
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float ekfstatus { get; set; }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public int wpno
+        public float AOA
         {
-            get { return _wpno; }
+            get { return _AOA; }
             set
             {
-                if (_wpno != value)
+                if (_AOA != value)
                 {
-                    _wpno = value;
+                    _AOA = value;
+                    displayAOASSA = true;
                     this.Invalidate();
                 }
             }
         }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
-        public float xtrack_error
+        public float critAOA
         {
-            get { return _xtrack_error; }
+            get { return _critAOA; }
             set
             {
-                if (_xtrack_error != value)
+                if (_critAOA != value)
                 {
-                    _xtrack_error = value;
+                    _critAOA = value;
                     this.Invalidate();
                 }
             }
         }
 
-        public void doResize()
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float SSA
         {
-            OnResize(EventArgs.Empty);
+            get { return _SSA; }
+            set
+            {
+                if (_SSA != value)
+                {
+                    _SSA = value;
+                    displayAOASSA = true;
+                    this.Invalidate();
+                }
+            }
         }
 
-  
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public float critSSA
+        {
+            get { return _critSSA; }
+            set
+            {
+                if (_critSSA != value)
+                {
+                    _critSSA = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        private bool statuslast = false;
+        private DateTime armedtimer = DateTime.MinValue;
+
+        public struct Custom
+        {
+            //public Point Position;
+            //public float FontSize;
+            public string Header;
+
+            public System.Reflection.PropertyInfo Item;
+
+            public double GetValue
+            {
+                get
+                {
+                    if (Item.PropertyType == typeof(Single))
+                    {
+                        return (double) (float) Item.GetValue(src, null);
+                    }
+
+                    if (Item.PropertyType == typeof(Int32))
+                    {
+                        return (double) (int) Item.GetValue(src, null);
+                    }
+
+                    if (Item.PropertyType == typeof(double))
+                    {
+                        return (double) Item.GetValue(src, null);
+                    }
+
+                    throw new Exception("Bad data type");
+                }
+            }
+
+            public static object src { get; set; }
+        }
+
+        public Hashtable CustomItems = new Hashtable();
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public Color hudcolor
+        {
+            get { return this._whitePen.Color; }
+            set
+            {
+                _hudcolor = value;
+                this._whitePen = new Pen(value, 2);
+            }
+        }
+
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public Color skyColor1
+        {
+            get { return _skyColor1; }
+            set { _skyColor1 = value; }
+        }
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
+        public Color skyColor2
+        {
+            get { return _skyColor2; }
+            set { _skyColor2 = value; }
+        }
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values"), DefaultValue(typeof(Color), "0x9bb824")]
+        public Color groundColor1
+        {
+            get { return _groundColor1; }
+            set { _groundColor1 = value; }
+        }
+        [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values"), DefaultValue(typeof(Color), "0x414f07")]
+        public Color groundColor2
+        {
+            get { return _groundColor2; }
+            set { _groundColor2 = value; }
+        }
+
+        private Color _skyColor1 = Color.Blue;
+        private Color _skyColor2 = Color.LightBlue;
+        private Color _groundColor1 = Color.FromArgb(0x9b, 0xb8, 0x24);
+        private Color _groundColor2 = Color.FromArgb(0x41, 0x4f, 0x07);
+
+        private Color _hudcolor = Color.White;
+        private Pen _whitePen = new Pen(Color.White, 2);
+        private readonly SolidBrush _whiteBrush = new SolidBrush(Color.White);
+
+        private static readonly SolidBrush SolidBrush = new SolidBrush(Color.FromArgb(0x55, 0xff, 0xff, 0xff));
+
+        private static readonly SolidBrush SlightlyTransparentWhiteBrush =
+            new SolidBrush(Color.FromArgb(220, 255, 255, 255));
+
+        private static readonly SolidBrush AltGroundBrush = new SolidBrush(Color.FromArgb(100, Color.BurlyWood));
+
+        private readonly object _bgimagelock = new object();
+
+        public Image bgimage
+        {
+            set
+            {
+                lock (this._bgimagelock)
+                {
+                    try
+                    {
+                        _bgimage = (Image) value;
+                    }
+                    catch
+                    {
+                        _bgimage = null;
+                    }
+
+                    this.Invalidate();
+                }
+            }
+            get { return _bgimage; }
+        }
+
+        private Image _bgimage;
+
+        // move these global as they rarely change - reduce GC
+        private Font font = new Font(HUDT.Font, 10);
+
+        public Bitmap objBitmap = new Bitmap(1024, 1024, PixelFormat.Format32bppArgb);
+        private int count = 0;
+        private DateTime countdate = DateTime.Now;
+        private HUD graphicsObject;
+        private IGraphics graphicsObjectGDIP;
+
+        private DateTime starttime = DateTime.MinValue;
+
+        private System.ComponentModel.ComponentResourceManager resources =
+            new System.ComponentModel.ComponentResourceManager(typeof(HUD));
+
+
+
+        public override void Refresh()
+        {
+            if (!ThisReallyVisible())
+            {
+                //  return;
+            }
+
+            //base.Refresh();
+            using (Graphics gg = this.CreateGraphics())
+            {
+                OnPaint(new PaintEventArgs(gg, this.ClientRectangle));
+            }
+        }
+
+        DateTime lastinvalidate = DateTime.MinValue;
 
         /// <summary>
         /// Override to prevent offscreen drawing the control - mono mac
@@ -836,18 +866,6 @@ namespace MissionPlanner.Controls
             base.Invalidate();
         }
 
-        public override void Refresh()
-        {
-            if (!ThisReallyVisible())
-            {
-                //  return;
-            }
-
-            base.Refresh();
-            
-        }
-        
-
         /// <summary>
         /// this is to fix a mono off screen drawing issue
         /// </summary>
@@ -857,50 +875,22 @@ namespace MissionPlanner.Controls
             //Control ctl = Control.FromHandle(this.Handle);
             return this.Visible;
         }
-        
-
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            try
-            {
-                if (opengl && !DesignMode)
-                {
-                    base.OnHandleCreated(e);
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Expected failure on max/linux due to opengl support");
-                log.Error(ex);
-                opengl = false;
-            } // macs/linux fail here
-        }
-
-        protected override void OnHandleDestroyed(EventArgs e)
-        {
-            try
-            {
-                if (opengl && !DesignMode)
-                {
-                    base.OnHandleDestroyed(e);
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Info(ex.ToString());
-                opengl = false;
-            }
-        }
 
         protected override void OnLoad(EventArgs e)
         {
             log.Info("OnLoad Start");
-            
 
+         
             log.Info("OnLoad Done");
 
             started = true;
         }
+
+        public event EventHandler ekfclick;
+        public event EventHandler vibeclick;
+
+        Rectangle ekfhitzone = new Rectangle();
+        Rectangle vibehitzone = new Rectangle();
 
         protected override void OnMouseClick(MouseEventArgs e)
         {
@@ -937,6 +927,10 @@ namespace MissionPlanner.Controls
             }
         }
 
+        bool inOnPaint = false;
+        string otherthread = "";
+
+
         protected override void OnPaint(PaintEventArgs e)
         {
             //GL.Enable(EnableCap.AlphaTest)
@@ -945,9 +939,18 @@ namespace MissionPlanner.Controls
 
             // Console.WriteLine("hud ms " + (DateTime.Now.Millisecond));
 
-          //  if (!started)
-            //    return;
+            opengl = false;
 
+            if (this.DesignMode)
+            {
+                e.Graphics.Clear(this.BackColor);
+                e.Graphics.Flush();
+                opengl = false;
+                doPaint();
+                e.Graphics.DrawImageUnscaled(objBitmap, 0, 0);
+         
+                return;
+            }
 
             if ((DateTime.Now - starttime).TotalMilliseconds < 30 && (_bgimage == null))
             {
@@ -984,15 +987,17 @@ namespace MissionPlanner.Controls
             try
             {
 
-
-
-                graphicsObject = e.Graphics;
+          
 
                 doPaint();
 
-            
+                if (!opengl)
+                {
+                    e.Graphics.DrawImageUnscaled(objBitmap, 0, 0);
 
-             
+                    //File.WriteAllText("hud.svg", graphicsObjectGDIP.WriteSVGString());
+                }
+          
 
             }
             catch (Exception ex)
@@ -1002,7 +1007,7 @@ namespace MissionPlanner.Controls
 
             count++;
 
-            huddrawtime += (int)(DateTime.Now - starttime).TotalMilliseconds;
+            huddrawtime += (int) (DateTime.Now - starttime).TotalMilliseconds;
 
             if (DateTime.Now.Second != countdate.Second)
             {
@@ -1021,71 +1026,276 @@ namespace MissionPlanner.Controls
             }
         }
 
-        protected override void OnPaintBackground(PaintEventArgs e)
+        void Clear(Color color)
         {
-            //base.OnPaintBackground(e);
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            if (DesignMode || !IsHandleCreated || !started)
-                return;
-
-            base.OnResize(e);
-
-            if (SixteenXNine)
+            if (opengl)
             {
-                int ht = (int)(this.Width / 1.777f);
-                if (ht >= this.Height + 5 || ht <= this.Height - 5)
-                {
-                    this.Height = ht;
-                    return;
-                }
+        
             }
             else
             {
-                // 4x3
-                int ht = (int)(this.Width / 1.333f);
-                if (ht >= this.Height + 5 || ht <= this.Height - 5)
-                {
-                    this.Height = ht;
-                    return;
-                }
+                graphicsObjectGDIP.Clear(color);
             }
+        }
 
-          
-            try
+        const double rad2deg = (180 / Math.PI);
+        const double deg2rad = (1.0 / rad2deg);
+
+        public void DrawArc(Pen penn, RectangleF rect, float start, float degrees)
+        {
+            if (opengl)
             {
-                foreach (character texid in charDict.Values)
-                {
-                    try
-                    {
-                        texid.bitmap.Dispose();
-                    }
-                    catch
-                    {
-                    }
-                }
+              
+            }
+            else
+            {
+                graphicsObjectGDIP.DrawArc(penn, rect, start, degrees);
+            }
+        }
+
+        public void DrawEllipse(Pen penn, Rectangle rect)
+        {
+            if (opengl)
+            {
+          
+            }
+            else
+            {
+                graphicsObjectGDIP.DrawEllipse(penn, rect);
+            }
+        }
+
+        public static Bitmap ResizeImage(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
 
      
-
-                charDict.Clear();
-            }
-            catch
+            using (var graphics = Graphics.FromImage(destImage))
             {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighSpeed;
+                graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+                graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+             
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
             }
 
+            return destImage;
+        }
+
+        private character[] _texture = new character[2];
+
+        public void DrawImage(Image img, int x, int y, int width, int height, int textureno = 0)
+        {
+            if (opengl)
+            {
+               
+            }
+            else
+            {
+                graphicsObjectGDIP.DrawImage(img, x, y, width, height);
+            }
+        }
+
+        public void DrawPath(Pen penn, GraphicsPath gp)
+        {
             try
             {
-         
+                List<PointF> list = new List<PointF>();
+                for (int i = 0; i < gp.PointCount; i++)
+                {
+                    var pnt = gp.PathPoints[i];
+                    var type = gp.PathTypes[i];
+
+                    if (type == 0)
+                    {
+                        if (list.Count != 0)
+                            DrawPolygon(penn, list.ToArray());
+                        list.Clear();
+                        list.Add(pnt);
+                    }
+
+                    if (type <= 3)
+                        list.Add(pnt);
+
+                    if ((type & 0x80) > 0)
+                    {
+                        list.Add(pnt);
+                        list.Add(list[0]);
+                        DrawPolygon(penn, list.ToArray());
+                        list.Clear();
+                    }
+                }
             }
             catch
             {
             }
-
-            Refresh();
         }
-        
+
+        public void FillPath(Brush brushh, GraphicsPath gp)
+        {
+            try
+            {
+                if (opengl)
+                {
+             
+                }
+                else
+                    graphicsObjectGDIP.FillPath(brushh, gp);
+            }
+            catch
+            {
+            }
+        }
+
+        public void SetClip(Rectangle rect)
+        {
+
+        }
+
+        public void ResetClip()
+        {
+
+        }
+
+        public void ResetTransform()
+        {
+            if (opengl)
+            {
+              
+            }
+            else
+            {
+                graphicsObjectGDIP.ResetTransform();
+            }
+        }
+
+        public void RotateTransform(float angle)
+        {
+            if (opengl)
+            {
+               
+            }
+            else
+            {
+                graphicsObjectGDIP.RotateTransform(angle);
+            }
+        }
+
+        public void TranslateTransform(float x, float y)
+        {
+            if (opengl)
+            {
+             
+            }
+            else
+            {
+                graphicsObjectGDIP.TranslateTransform(x, y);
+            }
+        }
+
+        public void FillPolygon(Brush brushh, Point[] list)
+        {
+            if (opengl)
+            {
+             
+            }
+            else
+            {
+                graphicsObjectGDIP.FillPolygon(brushh, list);
+            }
+        }
+
+        public void FillPolygon(Brush brushh, PointF[] list)
+        {
+            if (opengl)
+            {
+             
+            }
+            else
+            {
+                graphicsObjectGDIP.FillPolygon(brushh, list);
+            }
+        }
+
+        public void DrawPolygon(Pen penn, Point[] list)
+        {
+            if (opengl)
+            {
+            
+            }
+            else
+            {
+                graphicsObjectGDIP.DrawPolygon(penn, list);
+            }
+        }
+
+        public void DrawPolygon(Pen penn, PointF[] list)
+        {
+            if (opengl)
+            {
+      
+            }
+            else
+            {
+                graphicsObjectGDIP.DrawPolygon(penn, list);
+            }
+        }
+
+
+        public void FillRectangle(Brush brushh, RectangleF rectf)
+        {
+            if (opengl)
+            {
+               
+            }
+            else
+            {
+                graphicsObjectGDIP.FillRectangle(brushh, rectf);
+            }
+        }
+
+        public void DrawRectangle(Pen penn, RectangleF rect)
+        {
+            DrawRectangle(penn, rect.X, rect.Y, rect.Width, rect.Height);
+        }
+
+        public void DrawRectangle(Pen penn, double x1, double y1, double width, double height)
+        {
+
+            if (opengl)
+            {
+               
+            }
+            else
+            {
+                graphicsObjectGDIP.DrawRectangle(penn, (float) x1, (float) y1, (float) width, (float) height);
+            }
+        }
+
+        public void DrawLine(Pen penn, double x1, double y1, double x2, double y2)
+        {
+
+            if (opengl)
+            {
+               
+            }
+            else
+            {
+                graphicsObjectGDIP.DrawLine(penn, (float) x1, (float) y1, (float) x2, (float) y2);
+            }
+        }
+
+        private readonly Pen _blackPen = new Pen(Color.Black, 2);
+        private readonly Pen _greenPen = new Pen(Color.Green, 2);
+        private readonly Pen _redPen = new Pen(Color.Red, 2);
 
         void doPaint()
         {
@@ -1093,7 +1303,22 @@ namespace MissionPlanner.Controls
             bool isNaN = false;
             try
             {
-    
+                if (graphicsObjectGDIP == null || !opengl &&
+                    (objBitmap.Width != this.Width || objBitmap.Height != this.Height))
+                {
+                    objBitmap = new Bitmap(this.Width, this.Height, PixelFormat.Format32bppArgb);
+                    objBitmap.MakeTransparent();
+                    graphicsObjectGDIP = Graphics.FromImage(objBitmap);
+
+                    graphicsObjectGDIP.SmoothingMode = SmoothingMode.HighSpeed;
+                    graphicsObjectGDIP.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    graphicsObjectGDIP.CompositingMode = CompositingMode.SourceOver;
+                    graphicsObjectGDIP.CompositingQuality = CompositingQuality.HighSpeed;
+                    graphicsObjectGDIP.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                    graphicsObjectGDIP.TextRenderingHint = TextRenderingHint.SystemDefault;
+                }
+
+                graphicsObjectGDIP.InterpolationMode = InterpolationMode.Bilinear;
 
                 try
                 {
@@ -1110,18 +1335,18 @@ namespace MissionPlanner.Controls
                 {
                     bgon = false;
                     lock (this._bgimagelock)
-                        lock (_bgimage)
+                    lock (_bgimage)
+                    {
+                        try
                         {
-                            try
-                            {
-                                graphicsObject.DrawImage(_bgimage, 0, 0, this.Width, this.Height);
-                            }
-                            catch (Exception ex)
-                            {
-                                log.Error(ex);
-                                _bgimage = null;
-                            }
+                            graphicsObject.DrawImage(_bgimage, 0, 0, this.Width, this.Height);
                         }
+                        catch (Exception ex)
+                        {
+                            log.Error(ex);
+                            _bgimage = null;
+                        }
+                    }
 
                     if (hudon == false)
                     {
@@ -1168,7 +1393,7 @@ namespace MissionPlanner.Controls
                 int halfwidth = this.Width / 2;
                 int halfheight = this.Height / 2;
 
-                _whiteBrush.Color = this._whitePen.Color;
+                this._whiteBrush.Color = this._whitePen.Color;
 
                 // Reset pens
                 this._blackPen.Width = 2;
@@ -1219,7 +1444,6 @@ namespace MissionPlanner.Controls
                         pitchoffset + 0);
                 }
 
-                
                 graphicsObject.ResetTransform();
 
                 if (displayrollpitch)
@@ -1257,7 +1481,7 @@ namespace MissionPlanner.Controls
                                 }
 
                                 drawstring(a.ToString(), font, fontsize + 2, _whiteBrush,
-                                    this.Width / 2 - lengthlong - 30 - halfwidth - (int)(fontoffset * 1.7),
+                                    this.Width / 2 - lengthlong - 30 - halfwidth - (int) (fontoffset * 1.7),
                                     pitchoffset + a * every5deg - 8 - fontoffset);
                             }
                             else
@@ -1278,7 +1502,7 @@ namespace MissionPlanner.Controls
 
                     lengthlong = this.Height / 66;
 
-                    int extra = (int)(this.Height / 15.0 * 4.9f);
+                    int extra = (int) (this.Height / 15.0 * 4.9f);
 
                     int lengthlongex = lengthlong + 2;
 
@@ -1298,7 +1522,7 @@ namespace MissionPlanner.Controls
 
                     this._redPen.Width = 2;
 
-                    int[] array = new int[] { -60, -45, -30, -20, -10, 0, 10, 20, 30, 45, 60 };
+                    int[] array = new int[] {-60, -45, -30, -20, -10, 0, 10, 20, 30, 45, 60};
 
                     foreach (int a in array)
                     {
@@ -1355,8 +1579,8 @@ namespace MissionPlanner.Controls
                 if (displayAOASSA)
                 {
                     graphicsObject.DrawEllipse(this._redPen,
-                        new Rectangle((int)(-halfwidth / 40 - _SSA * every5deg),
-                            (int)(-halfwidth / 40 - _AOA * every5deg), halfwidth / 20, halfwidth / 20));
+                        new Rectangle((int) (-halfwidth / 40 - _SSA * every5deg),
+                            (int) (-halfwidth / 40 - _AOA * every5deg), halfwidth / 20, halfwidth / 20));
                     graphicsObject.DrawLine(this._redPen, -halfwidth / 20 - _SSA * every5deg, 0 - _AOA * every5deg,
                         -halfwidth / 40 - _SSA * every5deg, 0 - _AOA * every5deg);
                     graphicsObject.DrawLine(this._redPen, halfwidth / 20 - _SSA * every5deg, 0 - _AOA * every5deg,
@@ -1387,7 +1611,7 @@ namespace MissionPlanner.Controls
                         headbg.Bottom - 5);
 
                     float space = (headbg.Width - 10) / 120.0f;
-                    int start = (int)Math.Round((_heading - 60), 1);
+                    int start = (int) Math.Round((_heading - 60), 1);
 
                     // draw for outside the 60 deg
                     if (_targetheading < start)
@@ -1407,14 +1631,14 @@ namespace MissionPlanner.Controls
                     for (int a = start; a <= _heading + 60; a += 1)
                     {
                         // target heading
-                        if (((int)(a + 360) % 360) == (int)_targetheading)
+                        if (((int) (a + 360) % 360) == (int) _targetheading)
                         {
                             this._greenPen.Width = 6;
                             graphicsObject.DrawLine(this._greenPen, headbg.Left + 5 + space * (a - start),
                                 headbg.Bottom, headbg.Left + 5 + space * (a - start), headbg.Top);
                         }
 
-                        if (((int)(a + 360) % 360) == (int)_groundcourse)
+                        if (((int) (a + 360) % 360) == (int) _groundcourse)
                         {
                             this._blackPen.Width = 6;
                             graphicsObject.DrawLine(this._blackPen, headbg.Left + 5 + space * (a - start),
@@ -1422,13 +1646,13 @@ namespace MissionPlanner.Controls
                             this._blackPen.Width = 2;
                         }
 
-                        if ((int)a % 15 == 0)
+                        if ((int) a % 15 == 0)
                         {
                             //Console.WriteLine(a + " " + Math.Round(a, 1, MidpointRounding.AwayFromZero));
                             //Console.WriteLine(space +" " + a +" "+ (headbg.Left + 5 + space * (a - start)));
                             graphicsObject.DrawLine(this._whitePen, headbg.Left + 5 + space * (a - start),
                                 headbg.Bottom - 5, headbg.Left + 5 + space * (a - start), headbg.Bottom - 10);
-                            int disp = (int)a;
+                            int disp = (int) a;
                             if (disp < 0)
                                 disp += 360;
                             disp = disp % 360;
@@ -1436,58 +1660,58 @@ namespace MissionPlanner.Controls
                             {
                                 drawstring(HUDT.N.PadLeft(2), font, fontsize + 4, _whiteBrush,
                                     headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                             else if (disp == 45)
                             {
                                 drawstring(HUDT.NE.PadLeft(2), font, fontsize + 4, _whiteBrush,
                                     headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                             else if (disp == 90)
                             {
                                 drawstring(HUDT.E.PadLeft(2), font, fontsize + 4, _whiteBrush,
                                     headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                             else if (disp == 135)
                             {
                                 drawstring(HUDT.SE.PadLeft(2), font, fontsize + 4, _whiteBrush,
                                     headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                             else if (disp == 180)
                             {
                                 drawstring(HUDT.S.PadLeft(2), font, fontsize + 4, _whiteBrush,
                                     headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                             else if (disp == 225)
                             {
                                 drawstring(HUDT.SW.PadLeft(2), font, fontsize + 4, _whiteBrush,
                                     headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                             else if (disp == 270)
                             {
                                 drawstring(HUDT.W.PadLeft(2), font, fontsize + 4, _whiteBrush,
                                     headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                             else if (disp == 315)
                             {
                                 drawstring(HUDT.NW.PadLeft(2), font, fontsize + 4, _whiteBrush,
                                     headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                             else
                             {
-                                drawstring(String.Format("{0,3}", (int)(disp % 360)), font, fontsize,
+                                drawstring(String.Format("{0,3}", (int) (disp % 360)), font, fontsize,
                                     _whiteBrush, headbg.Left - 5 + space * (a - start) - fontoffset,
-                                    headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                                    headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                             }
                         }
-                        else if ((int)a % 5 == 0)
+                        else if ((int) a % 5 == 0)
                         {
                             graphicsObject.DrawLine(this._whitePen, headbg.Left + 5 + space * (a - start),
                                 headbg.Bottom - 5, headbg.Left + 5 + space * (a - start), headbg.Bottom - 10);
@@ -1498,19 +1722,19 @@ namespace MissionPlanner.Controls
                         headbg.Height);
 
                     //DrawRectangle(whitePen, rect);
-                    graphicsObject.FillRectangle(SlightlyTransparentWhiteBrush, rect);
+                    FillRectangle(SlightlyTransparentWhiteBrush, rect);
 
                     if (Math.Abs(_heading - _targetheading) < 4)
                     {
-                        drawstring(String.Format("{0,3}", (int)(heading % 360)), font, fontsize,
+                        drawstring(String.Format("{0,3}", (int) (heading % 360)), font, fontsize,
                             _whiteBrush, headbg.Width / 2 - (fontsize * 1f),
-                            headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                            headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                     }
                     else
                     {
-                        drawstring(String.Format("{0,3}", (int)(heading % 360)), font, fontsize,
+                        drawstring(String.Format("{0,3}", (int) (heading % 360)), font, fontsize,
                             _whiteBrush, headbg.Width / 2 - (fontsize * 1f),
-                            headbg.Bottom - 24 - (int)(fontoffset * 1.7));
+                            headbg.Bottom - 24 - (int) (fontoffset * 1.7));
                     }
 
                 }
@@ -1629,7 +1853,7 @@ namespace MissionPlanner.Controls
                         speed = _groundspeed;
 
                     float space = (scrollbg.Height) / viewrange;
-                    float start = (long)(speed - viewrange / 2);
+                    float start = (long) (speed - viewrange / 2);
 
                     if (start > _targetspeed)
                     {
@@ -1649,10 +1873,10 @@ namespace MissionPlanner.Controls
                         this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
                     }
 
-                    long end = (long)(speed + viewrange / 2);
-                    for (long a = (long)start; a <= end; a += 1)
+                    long end = (long) (speed + viewrange / 2);
+                    for (long a = (long) start; a <= end; a += 1)
                     {
-                        if (a == (long)_targetspeed && _targetspeed != 0)
+                        if (a == (long) _targetspeed && _targetspeed != 0)
                         {
                             this._greenPen.Width = 6;
                             graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * (a - start),
@@ -1665,13 +1889,13 @@ namespace MissionPlanner.Controls
                             graphicsObject.DrawLine(this._whitePen, scrollbg.Right, scrollbg.Top - space * (a - start),
                                 scrollbg.Right - 10, scrollbg.Top - space * (a - start));
                             drawstring(String.Format("{0,5}", a), font, fontsize, _whiteBrush, 0,
-                                (float)(scrollbg.Top - space * (a - start) - 6 - fontoffset));
+                                (float) (scrollbg.Top - space * (a - start) - 6 - fontoffset));
                         }
                     }
 
                     graphicsObject.DrawPolygon(this._blackPen, arrow);
                     graphicsObject.FillPolygon(Brushes.Black, arrow);
-                    drawstring((speed).ToString("0") + speedunit, font, 10, (SolidBrush)Brushes.AliceBlue, 0, -9);
+                    drawstring((speed).ToString("0") + speedunit, font, 10, (SolidBrush) Brushes.AliceBlue, 0, -9);
 
                     graphicsObject.ResetTransform();
 
@@ -1680,7 +1904,7 @@ namespace MissionPlanner.Controls
                     if (_lowairspeed)
                     {
                         drawstring(HUDT.AS + _airspeed.ToString("0.0") + speedunit, font, fontsize,
-                            (SolidBrush)Brushes.Red, 1, scrollbg.Bottom + 5);
+                            (SolidBrush) Brushes.Red, 1, scrollbg.Bottom + 5);
                     }
                     else
                     {
@@ -1691,7 +1915,7 @@ namespace MissionPlanner.Controls
                     if (_lowgroundspeed)
                     {
                         drawstring(HUDT.GS + _groundspeed.ToString("0.0") + speedunit, font, fontsize,
-                            (SolidBrush)Brushes.Red, 1, scrollbg.Bottom + fontsize + 2 + 10);
+                            (SolidBrush) Brushes.Red, 1, scrollbg.Bottom + fontsize + 2 + 10);
                     }
                     else
                     {
@@ -1724,8 +1948,8 @@ namespace MissionPlanner.Controls
 
                     int viewrange = 26;
 
-                    float space = (scrollbg.Height) / (float)viewrange;
-                    long start = ((int)_alt - viewrange / 2);
+                    float space = (scrollbg.Height) / (float) viewrange;
+                    long start = ((int) _alt - viewrange / 2);
 
                     if (start > _targetalt)
                     {
@@ -1771,7 +1995,7 @@ namespace MissionPlanner.Controls
                             graphicsObject.DrawLine(this._whitePen, scrollbg.Left, scrollbg.Top - space * (a - start),
                                 scrollbg.Left + 10, scrollbg.Top - space * (a - start));
                             drawstring(String.Format("{0,5}", a), font, fontsize, _whiteBrush,
-                                scrollbg.Left + 0 + (int)(0 * fontoffset),
+                                scrollbg.Left + 0 + (int) (0 * fontoffset),
                                 scrollbg.Top - space * (a - start) - 6 - fontoffset);
                         }
 
@@ -1799,7 +2023,7 @@ namespace MissionPlanner.Controls
 
                     float scaledvalue = _verticalspeed / -viewrange * (scrollbg.Bottom - scrollbg.Top);
 
-                    float linespace = (float)1 / -viewrange * (scrollbg.Bottom - scrollbg.Top);
+                    float linespace = (float) 1 / -viewrange * (scrollbg.Bottom - scrollbg.Top);
 
                     PointF[] polyn = new PointF[4];
 
@@ -1852,39 +2076,39 @@ namespace MissionPlanner.Controls
                     graphicsObject.ResetTransform();
                     graphicsObject.TranslateTransform(0, this.Height / 2);
 
-                    drawstring(((int)_alt).ToString("0 ") + altunit, font, 10, (SolidBrush)Brushes.AliceBlue,
+                    drawstring(((int) _alt).ToString("0 ") + altunit, font, 10, (SolidBrush) Brushes.AliceBlue,
                         scrollbg.Left + 10, -9);
                     graphicsObject.ResetTransform();
 
                     // mode and wp dist and wp
                     drawstring(_mode, font, fontsize, _whiteBrush, scrollbg.Left - 30,
                         scrollbg.Bottom + 5);
-                    drawstring((int)_disttowp + distunit + ">" + _wpno, font, fontsize, _whiteBrush,
+                    drawstring((int) _disttowp + distunit + ">" + _wpno, font, fontsize, _whiteBrush,
                         scrollbg.Left - 30, scrollbg.Bottom + fontsize + 2 + 10);
                 }
 
                 if (displayconninfo)
                 {
                     graphicsObject.DrawLine(this._greenPen, scrollbg.Left - 5,
-                        scrollbg.Top - (int)(fontsize * 2.2) - 2 - 20, scrollbg.Left - 5,
-                        scrollbg.Top - (int)(fontsize) - 2 - 20);
+                        scrollbg.Top - (int) (fontsize * 2.2) - 2 - 20, scrollbg.Left - 5,
+                        scrollbg.Top - (int) (fontsize) - 2 - 20);
                     graphicsObject.DrawLine(this._greenPen, scrollbg.Left - 10,
-                        scrollbg.Top - (int)(fontsize * 2.2) - 2 - 15, scrollbg.Left - 10,
-                        scrollbg.Top - (int)(fontsize) - 2 - 20);
+                        scrollbg.Top - (int) (fontsize * 2.2) - 2 - 15, scrollbg.Left - 10,
+                        scrollbg.Top - (int) (fontsize) - 2 - 20);
                     graphicsObject.DrawLine(this._greenPen, scrollbg.Left - 15,
-                        scrollbg.Top - (int)(fontsize * 2.2) - 2 - 10, scrollbg.Left - 15,
-                        scrollbg.Top - (int)(fontsize) - 2 - 20);
+                        scrollbg.Top - (int) (fontsize * 2.2) - 2 - 10, scrollbg.Left - 15,
+                        scrollbg.Top - (int) (fontsize) - 2 - 20);
 
                     drawstring(_linkqualitygcs.ToString("0") + "%", font, fontsize, _whiteBrush,
-                        scrollbg.Left, scrollbg.Top - (int)(fontsize * 2.2) - 2 - 20);
+                        scrollbg.Left, scrollbg.Top - (int) (fontsize * 2.2) - 2 - 20);
                     if (_linkqualitygcs == 0)
                     {
                         graphicsObject.DrawLine(this._redPen, scrollbg.Left,
-                            scrollbg.Top - (int)(fontsize * 2.2) - 2 - 20, scrollbg.Left + 50,
-                            scrollbg.Top - (int)(fontsize * 2.2) - 2);
+                            scrollbg.Top - (int) (fontsize * 2.2) - 2 - 20, scrollbg.Left + 50,
+                            scrollbg.Top - (int) (fontsize * 2.2) - 2);
 
-                        graphicsObject.DrawLine(this._redPen, scrollbg.Left, scrollbg.Top - (int)(fontsize * 2.2) - 2,
-                            scrollbg.Left + 50, scrollbg.Top - (int)(fontsize * 2.2) - 2 - 20);
+                        graphicsObject.DrawLine(this._redPen, scrollbg.Left, scrollbg.Top - (int) (fontsize * 2.2) - 2,
+                            scrollbg.Left + 50, scrollbg.Top - (int) (fontsize * 2.2) - 2 - 20);
                     }
 
                     drawstring(_datetime.ToString("HH:mm:ss"), font, fontsize, _whiteBrush,
@@ -1894,7 +2118,7 @@ namespace MissionPlanner.Controls
                 // AOA
                 if (displayAOASSA)
                 {
-                    scrollbg = new Rectangle((int)(this.Width - (double)this.Width / 6), halfheight + halfheight / 10,
+                    scrollbg = new Rectangle((int) (this.Width - (double) this.Width / 6), halfheight + halfheight / 10,
                         this.Width / 25, this.Height / 5);
 
                     graphicsObject.ResetTransform();
@@ -1944,7 +2168,7 @@ namespace MissionPlanner.Controls
 
                     if (lowvoltagealert)
                     {
-                        drawstring(text, font, fontsize + 2, (SolidBrush)Brushes.Red, fontsize,
+                        drawstring(text, font, fontsize + 2, (SolidBrush) Brushes.Red, fontsize,
                             this.Height - 30 - fontoffset);
                     }
                     else
@@ -1964,12 +2188,12 @@ namespace MissionPlanner.Controls
                     if (_fix == 0)
                     {
                         gps = (HUDT.GPS0);
-                        col = (SolidBrush)Brushes.Red;
+                        col = (SolidBrush) Brushes.Red;
                     }
                     else if (_fix == 1)
                     {
                         gps = (HUDT.GPS1);
-                        col = (SolidBrush)Brushes.Red;
+                        col = (SolidBrush) Brushes.Red;
                     }
                     else if (_fix == 2)
                     {
@@ -2002,7 +2226,7 @@ namespace MissionPlanner.Controls
 
                 if (isNaN)
                     drawstring("NaN Error " + DateTime.Now, font, this.Height / 30 + 10,
-                        (SolidBrush)Brushes.Red, 50, 50);
+                        (SolidBrush) Brushes.Red, 50, 50);
 
                 // custom user items
                 graphicsObject.ResetTransform();
@@ -2011,7 +2235,7 @@ namespace MissionPlanner.Controls
                 {
                     try
                     {
-                        Custom item = (Custom)CustomItems[key];
+                        Custom item = (Custom) CustomItems[key];
                         if (item.Item == null)
                             continue;
                         if (item.Item.Name.Contains("lat") || item.Item.Name.Contains("lng"))
@@ -2027,11 +2251,11 @@ namespace MissionPlanner.Controls
                         else if (item.Item.Name == "timeInAir")
                         {
                             double stime = item.GetValue;
-                            int hrs = (int)(stime / (60 * 60));
+                            int hrs = (int) (stime / (60 * 60));
                             //stime -= hrs * 60 * 60;
-                            int mins = (int)(stime / (60)) % 60;
+                            int mins = (int) (stime / (60)) % 60;
                             //stime = mins * 60;
-                            int secs = (int)(stime % 60);
+                            int secs = (int) (stime % 60);
                             drawstring(
                                 item.Header + hrs.ToString("00") + ":" + mins.ToString("00") + ":" +
                                 secs.ToString("00"), font, fontsize + 2, _whiteBrush, this.Width / 8, height);
@@ -2066,7 +2290,7 @@ namespace MissionPlanner.Controls
                 {
                     //if ((armedtimer.AddSeconds(8) > DateTime.Now))
                     {
-                        drawstring(HUDT.DISARMED, font, fontsize + 10, (SolidBrush)Brushes.Red, -85,
+                        drawstring(HUDT.DISARMED, font, fontsize + 10, (SolidBrush) Brushes.Red, -85,
                             halfheight / -3);
                         statuslast = status;
                     }
@@ -2075,7 +2299,7 @@ namespace MissionPlanner.Controls
                 {
                     if ((armedtimer.AddSeconds(8) > DateTime.Now))
                     {
-                        drawstring(HUDT.ARMED, font, fontsize + 20, (SolidBrush)Brushes.Red, -70,
+                        drawstring(HUDT.ARMED, font, fontsize + 20, (SolidBrush) Brushes.Red, -70,
                             halfheight / -3);
                         statuslast = status;
                     }
@@ -2083,14 +2307,14 @@ namespace MissionPlanner.Controls
 
                 if (failsafe == true)
                 {
-                    drawstring(HUDT.FAILSAFE, font, fontsize + 20, (SolidBrush)Brushes.Red, -85,
+                    drawstring(HUDT.FAILSAFE, font, fontsize + 20, (SolidBrush) Brushes.Red, -85,
                         halfheight / -HUDT.FailsafeH);
                     statuslast = status;
                 }
 
                 if (message != "" && messagetime.AddSeconds(10) > DateTime.Now)
                 {
-                    drawstring(message, font, fontsize + 10, (SolidBrush)Brushes.Red, -halfwidth + 50,
+                    drawstring(message, font, fontsize + 10, (SolidBrush) Brushes.Red, -halfwidth + 50,
                         halfheight / 3);
                 }
 
@@ -2103,7 +2327,7 @@ namespace MissionPlanner.Controls
 
                     if (vibex > 30 || vibey > 30 || vibez > 30)
                     {
-                        drawstring("Vibe", font, fontsize + 2, (SolidBrush)Brushes.Red, vibehitzone.X,
+                        drawstring("Vibe", font, fontsize + 2, (SolidBrush) Brushes.Red, vibehitzone.X,
                             vibehitzone.Y);
                     }
                     else
@@ -2122,13 +2346,13 @@ namespace MissionPlanner.Controls
                     {
                         if (ekfstatus > 0.8)
                         {
-                            drawstring("EKF", font, fontsize + 2, (SolidBrush)Brushes.Red,
+                            drawstring("EKF", font, fontsize + 2, (SolidBrush) Brushes.Red,
                                 ekfhitzone.X,
                                 ekfhitzone.Y);
                         }
                         else
                         {
-                            drawstring("EKF", font, fontsize + 2, (SolidBrush)Brushes.Orange,
+                            drawstring("EKF", font, fontsize + 2, (SolidBrush) Brushes.Orange,
                                 ekfhitzone.X,
                                 ekfhitzone.Y);
                         }
@@ -2146,37 +2370,61 @@ namespace MissionPlanner.Controls
 
                 //                Console.WriteLine("HUD 1 " + (DateTime.Now - starttime).TotalMilliseconds + " " + DateTime.Now.Millisecond);
 
+     
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex);
                 log.Info("hud error " + ex.ToString());
             }
         }
 
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            //base.OnPaintBackground(e);
+        }
 
+  
+
+   
+
+
+        float wrap360(float noin)
+        {
+            if (noin < 0)
+                return noin + 360;
+            return noin;
+        }
+
+        /// <summary>
+        /// pen for drawstring
+        /// </summary>
+        private readonly Pen _p = new Pen(Color.FromArgb(0x26, 0x27, 0x28), 2f);
+
+        /// <summary>
+        /// pth for drawstring
+        /// </summary>
+        private readonly GraphicsPath pth = new GraphicsPath();
+
+      
         void drawstring(string text, Font font, float fontsize, SolidBrush brush, float x, float y)
         {
             if (text == null || text == "")
                 return;
 
-            graphicsObject.DrawString(text, font, brush, x, y);
-            return;
-
             float maxy = 0;
 
             foreach (char cha in text)
             {
-                int charno = (int)cha;
+                int charno = (int) cha;
 
-                int charid = charno ^ (int)(fontsize * 1000) ^ brush.Color.ToArgb();
+                int charid = charno ^ (int) (fontsize * 1000) ^ brush.Color.ToArgb();
 
                 if (!charDict.ContainsKey(charid))
                 {
                     charDict[charid] = new character()
                     {
-                        bitmap = new Bitmap(128, 128, SKColorType.Bgra8888),
-                        size = (int)fontsize
+                        bitmap = new Bitmap(128, 128, PixelFormat.Format32bppArgb),
+                        size = (int) fontsize
                     };
 
                     charDict[charid].bitmap.MakeTransparent(Color.Transparent);
@@ -2192,7 +2440,7 @@ namespace MissionPlanner.Controls
                         var pth = new GraphicsPath();
 
                         if (text != null)
-                            pth.AddString(cha + "", font.FontFamily, 0, fontsize + 5, new Point((int)0, (int)0),
+                            pth.AddString(cha + "", font.FontFamily, 0, fontsize + 5, new Point((int) 0, (int) 0),
                                 StringFormat.GenericTypographic);
 
                         charDict[charid].pth = pth;
@@ -2219,7 +2467,7 @@ namespace MissionPlanner.Controls
                         }
                     }
 
-                    charDict[charid].width = (int)(maxx + 2);
+                    charDict[charid].width = (int) (maxx + 2);
                 }
 
                 // draw it
@@ -2228,7 +2476,17 @@ namespace MissionPlanner.Controls
                 // dont draw spaces
                 if (cha != ' ')
                 {
-                    graphicsObject.DrawImage(charDict[charid].bitmap, (int)x, (int)y, charDict[charid].bitmap.Width, charDict[charid].bitmap.Height);
+                    DrawImage(charDict[charid].bitmap, (int) x, (int) y, charDict[charid].bitmap.Width, charDict[charid].bitmap.Height, charDict[charid].gltextureid);
+                    /*
+                    graphicsObjectGDIP.TranslateTransform(x,y);
+                    graphicsObjectGDIP.DrawPath(this._p, charDict[charid].pth);
+
+                    //Draw the face
+
+                    graphicsObjectGDIP.FillPath(brush, charDict[charid].pth);
+
+                    graphicsObjectGDIP.TranslateTransform(-x, -y);
+                    */
                 }
                 else
                 {
@@ -2240,56 +2498,119 @@ namespace MissionPlanner.Controls
 
         }
 
-        float wrap360(float noin)
+        protected override void OnHandleCreated(EventArgs e)
         {
-            if (noin < 0)
-                return noin + 360;
-            return noin;
+            try
+            {
+                if (opengl && !DesignMode)
+                {
+                    base.OnHandleCreated(e);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Expected failure on max/linux due to opengl support");
+                log.Error(ex);
+                opengl = false;
+            } // macs/linux fail here
         }
 
-        public struct Custom
+        protected override void OnHandleDestroyed(EventArgs e)
         {
-            //public Point Position;
-            //public float FontSize;
-            public string Header;
-
-            public System.Reflection.PropertyInfo Item;
-
-            public static object src { get; set; }
-
-            public double GetValue
+            try
             {
-                get
+                if (opengl && !DesignMode)
                 {
-                    if (Item.PropertyType == typeof(Single))
-                    {
-                        return (double)(float)Item.GetValue(src, null);
-                    }
-
-                    if (Item.PropertyType == typeof(Int32))
-                    {
-                        return (double)(int)Item.GetValue(src, null);
-                    }
-
-                    if (Item.PropertyType == typeof(double))
-                    {
-                        return (double)Item.GetValue(src, null);
-                    }
-
-                    throw new Exception("Bad data type");
+                    base.OnHandleDestroyed(e);
                 }
+            }
+            catch (Exception ex)
+            {
+                log.Info(ex.ToString());
+                opengl = false;
             }
         }
 
-        private class character
+        public void doResize()
         {
-            public Bitmap bitmap;
-            public int gltextureid;
-            public GraphicsPath pth;
-            public int size;
-            public int width;
+            OnResize(EventArgs.Empty);
         }
+
+        protected override void OnResize(EventArgs e)
+        {
+            if (DesignMode || !IsHandleCreated || !started)
+                return;
+
+            base.OnResize(e);
+
+            if (SixteenXNine)
+            {
+                int ht = (int) (this.Width / 1.777f);
+                if (ht >= this.Height + 5 || ht <= this.Height - 5)
+                {
+                    this.Height = ht;
+                    return;
+                }
+            }
+            else
+            {
+                // 4x3
+                int ht = (int) (this.Width / 1.333f);
+                if (ht >= this.Height + 5 || ht <= this.Height - 5)
+                {
+                    this.Height = ht;
+                    return;
+                }
+            }
+
+            graphicsObjectGDIP = (Graphics.FromImage(objBitmap));
+
+            try
+            {
+                foreach (character texid in charDict.Values)
+                {
+                    try
+                    {
+                        texid.bitmap.Dispose();
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                if (opengl)
+                {
+                    foreach (character texid in _texture)
+                    {
+                        if (texid != null && texid.gltextureid != 0)
+                            GL.DeleteTexture(texid.gltextureid);
+                    }
+
+                    this._texture = new character[_texture.Length];
+
+                    foreach (character texid in charDict.Values)
+                    {
+                        if (texid.gltextureid != 0)
+                            GL.DeleteTexture(texid.gltextureid);
+                    }
+                }
+
+                charDict.Clear();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+     
+            }
+            catch
+            {
+            }
+
+            Refresh();
+        }
+
     }
-
-
 }

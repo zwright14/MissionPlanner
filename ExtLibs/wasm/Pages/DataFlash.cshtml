@@ -53,8 +53,7 @@
     </div>
 </div>
 
-
-
+<BECanvas Width="300" Height="400"  ref="@_canvasReference" ></BECanvas>
 
 @functions {
     ElementRef inputTypeFileElement;
@@ -62,6 +61,22 @@
     ElementRef checkElementRef;
 
     CollectionBuffer cb;
+
+    private Canvas2dContext _context;
+
+    protected BECanvasComponent _canvasReference;
+
+    protected override void OnAfterRender()
+    {
+        Console.WriteLine("AfterRender");
+        this._context = this._canvasReference.CreateCanvas2d();
+        this._context.FillStyle = "green";
+
+        this._context.FillRect(10, 100, 100, 100);
+
+        this._context.Font = "48px serif";
+        this._context.StrokeText("Hello Blazor!!!", 10, 100);
+    }
 
     public async void PlotItem(string type, string item)
     {

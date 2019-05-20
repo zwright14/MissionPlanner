@@ -1,42 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
-<Package
-  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
-  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  IgnorableNamespaces="uap mp">
-
-  <Identity
-    Name="19c18b47-4802-41c3-a818-f97d2705eb8e"
-    Publisher="CN=4c5fb2d3-922b-49c1-b6ef-6e16ad9b058f"
-    Version="1.0.0.0" />
-
-  <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
-
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" xmlns:uap4="http://schemas.microsoft.com/appx/manifest/uap/windows10/4" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap mp iot uap4 uap3 rescap">
+  <Identity Name="19c18b47-4802-41c3-a818-f97d2705eb8e" Publisher="CN=4c5fb2d3-922b-49c1-b6ef-6e16ad9b058f" Version="1.0.0.0" />
+  <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Xamarin.UWP</DisplayName>
     <PublisherDisplayName>4c5fb2d3-922b-49c1-b6ef-6e16ad9b058f</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
-
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
   </Dependencies>
-
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="x-generate" />
   </Resources>
-
   <Applications>
-    <Application Id="App"
-      Executable="$targetnametoken$.exe"
-      EntryPoint="Xamarin.UWP.App">
-      <uap:VisualElements
-        DisplayName="Xamarin.UWP"
-        Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="Xamarin.UWP"
-        BackgroundColor="transparent">
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Xamarin.UWP.App">
+      <uap:VisualElements DisplayName="Xamarin.UWP" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Xamarin.UWP" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\LargeTile.png" Square71x71Logo="Assets\SmallTile.png">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square150x150Logo" />
@@ -46,10 +25,54 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="xml">
+            <uap:SupportedFileTypes>
+              <uap:FileType>.xml</uap:FileType>
+              <uap:FileType>.tlog</uap:FileType>
+              <uap:FileType>.bin</uap:FileType>
+              <uap:FileType>.rlog</uap:FileType>
+              <uap:FileType>.txt</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+        <uap:Extension Category="windows.fileOpenPicker">
+          <uap:FileOpenPicker>
+            <uap:SupportedFileTypes>
+              <uap:SupportsAnyFileType />
+            </uap:SupportedFileTypes>
+          </uap:FileOpenPicker>
+        </uap:Extension>
+        <uap:Extension Category="windows.fileSavePicker">
+          <uap:FileSavePicker>
+            <uap:SupportedFileTypes>
+              <uap:SupportsAnyFileType />
+            </uap:SupportedFileTypes>
+          </uap:FileSavePicker>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
-
   <Capabilities>
     <Capability Name="internetClient" />
+    <Capability Name="codeGeneration" />
+    <Capability Name="privateNetworkClientServer" />
+    <Capability Name="internetClientServer" />
+    <uap:Capability Name="removableStorage" />
+    <iot:Capability Name="systemManagement" />
+    <uap4:Capability Name="userDataTasks" />
+    <uap3:Capability Name="userNotificationListener" />
+    <uap:Capability Name="documentsLibrary" />
+    <iot:Capability Name="lowLevelDevices" />
+    <uap4:Capability Name="offlineMapsManagement" />
+    <uap:Capability Name="picturesLibrary" />
+    <uap:Capability Name="userAccountInformation" />
+    <uap:Capability Name="videosLibrary" />
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="broadFileSystemAccess" />
+    <DeviceCapability Name="bluetooth" />
+    <DeviceCapability Name="location" />
+    <DeviceCapability Name="lowLevel" />
   </Capabilities>
 </Package>

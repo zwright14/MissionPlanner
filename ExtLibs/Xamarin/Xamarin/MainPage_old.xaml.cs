@@ -8,22 +8,29 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms.Markers;
 using MissionPlanner;
+using MissionPlanner.Antenna;
 using MissionPlanner.Controls;
+using MissionPlanner.GCSViews;
 using MissionPlanner.Utilities;
 using MissionPlanner.Utilities.Drawing;
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
-using Xamarin.Controls;
 using Xamarin.Forms;
+using Application = System.Windows.Forms.Application;
 using Brushes = MissionPlanner.Utilities.Drawing.Brushes;
 using Color = System.Drawing.Color;
+using Form = System.Windows.Forms.Form;
 using Graphics = MissionPlanner.Utilities.Drawing.Graphics;
 using Image = MissionPlanner.Utilities.Drawing.Image;
+using MouseButtons = MissionPlanner.Utilities.Drawing.MouseButtons;
 using Pen = MissionPlanner.Utilities.Drawing.Pen;
+using Point = System.Drawing.Point;
 using StringFormat = MissionPlanner.Utilities.Drawing.StringFormat;
 using SystemFonts = MissionPlanner.Utilities.Drawing.SystemFonts;
 
@@ -41,7 +48,7 @@ namespace Xamarin
 
         internal PointLatLng MouseDownStart;
 
-        private GMapMarker center = new GMapMarker(new PointLatLng(0.0, 0.0));
+        private GMapMarker center = new GMarkerGoogle(new PointLatLng(0.0, 0.0), GMarkerGoogleType.none);
 
         GMapMarker marker;
 
@@ -55,11 +62,9 @@ namespace Xamarin
         {
             InitializeComponent();
 
-            AGauge.BackgroundImage = Image.FromStream(new MemoryStream(Properties.Resources.guagebg));
+      
 
-            GMap.NET.GMaps.Instance.PrimaryCache = new MissionPlanner.Maps.MyImageCache();
-
-
+            /*
             GMapControl.MapProvider = GMapProviders.BingSatelliteMap;
 
             GMapControl.MapScaleInfoEnabled = true;
@@ -111,10 +116,14 @@ namespace Xamarin
             gMapControl1.Overlays.Add(rallypointoverlay);
 
             gMapControl1.Overlays.Add(poioverlay);
+            */
         }
         public GMapControl gMapControl1
         {
-            get { return GMapControl; }
+            get
+            {
+                return null;// GMapControl;
+                            }
         }
 
         private void gMapControl1_MouseDown(object sender, MouseEventArgs e)
@@ -130,7 +139,7 @@ namespace Xamarin
         }
         private void gMapControl1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == (System.Windows.Forms.MouseButtons) MouseButtons.Left)
             {
                 PointLatLng point = gMapControl1.FromLocalToLatLng(e.X, e.Y);
 
@@ -220,9 +229,17 @@ namespace Xamarin
             e.Surface.Canvas.DrawText(SkglView.CanvasSize.ToString(), 80, 60,
                 new SKPaint() {TextSize = 16, StrokeWidth = 2});
 
+         
 
-            AGauge.Value++;
+            g.ResetTransform();
+            g.DrawRectangle(new Pen(Color.Red), touchpoint.X, touchpoint.Y, 12, 12);
+
+
+            e.Surface.Canvas.Flush();
+
+   
         }
+
         private void SkglView_OnTouch(object sender, SKTouchEventArgs e)
         {
             touchpoint = e.Location;

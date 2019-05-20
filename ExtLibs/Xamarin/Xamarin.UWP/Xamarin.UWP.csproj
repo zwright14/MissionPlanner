@@ -2,6 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <DisableEmbeddedXbf>false</DisableEmbeddedXbf>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{6E11F62D-380C-44EE-9CBF-BF2F8BDB0CEA}</ProjectGuid>
@@ -18,6 +19,13 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>Xamarin.UWP_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>2EEA36DF01D5B72B0834888EB919704FB32B5BAB</PackageCertificateThumbprint>
+    <AppInstallerUpdateFrequency>1</AppInstallerUpdateFrequency>
+    <AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -75,6 +83,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <EnableGatekeeperAnalysis>true</EnableGatekeeperAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -152,10 +161,21 @@
       <Project>{d0c39d9d-bed0-418b-9a5e-713176caf40c}</Project>
       <Name>GMap.NET.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\mono\mcs\class\System.Windows.Forms\System.Windows.Forms-net_4_x.csproj">
+      <Project>{108227c7-8ed9-4483-949d-07bf0da1a201}</Project>
+      <Name>System.Windows.Forms-net_4_x</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Utilities\MissionPlanner.Utilities.csproj">
+      <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
+      <Name>MissionPlanner.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Xamarin\Xamarin.csproj" NoWarn="NU1201">
       <Project>{046987C6-A43A-45E6-AD0B-45F1A43005D0}</Project>
       <Name>Xamarin</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Xamarin.UWP_TemporaryKey.pfx" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

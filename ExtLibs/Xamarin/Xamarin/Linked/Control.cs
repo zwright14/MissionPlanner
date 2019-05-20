@@ -6,7 +6,7 @@ namespace System.Windows.Forms
 {
 
 
-    public class Control
+    public class Control1
     {
         public int Width { get; internal set; } = 100;
         public int Height { get; internal set; } = 100;

@@ -16,8 +16,7 @@ namespace MissionPlanner.Utilities
         internal GCSViews myhud;
         internal GCSViews instance;
         internal List<PointLatLngAlt> pointlist = new List<PointLatLngAlt>();
-        internal bool streamjpgenable = false;
-        internal MemoryStream streamjpg = new MemoryStream();
+  
         internal Control mymap = new Control();
 
         public static GCSViews FlightData { get; internal set; } = new GCSViews();

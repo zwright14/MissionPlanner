@@ -1,4 +1,4 @@
-﻿#define PocketPC
+﻿
 
 using MissionPlanner.Utilities.Drawing;
 
@@ -181,11 +181,9 @@ namespace GMap.NET.WindowsForms
          {
             if(ToolTip == null && !string.IsNullOrEmpty(value))
             {
-#if !PocketPC
-               ToolTip = new GMapRoundedToolTip(this);
-#else
+
                ToolTip = new GMapToolTip(this);
-#endif
+
             }
             toolTipText = value;
          }

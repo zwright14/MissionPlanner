@@ -21,15 +21,13 @@
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.Threading" Version="4.3.0" />
-    <PackageReference Include="Tewr.Blazor.FileReader" Version="0.7.1" />
+    <PackageReference Include="Tewr.Blazor.FileReader" Version="0.7.0" />
     <DotNetCliToolReference Include="Microsoft.AspNetCore.Blazor.Cli" Version="0.5.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\alglibnet\alglibnet.csproj" />
-    <ProjectReference Include="..\Arduino\Arduino.csproj" />
     <ProjectReference Include="..\ArduPilot\MissionPlanner.ArduPilot.csproj" />
-    <ProjectReference Include="..\AviFile\AviFile.csproj" />
     <ProjectReference Include="..\BouncyCastle\BouncyCastle.csproj" />
     <ProjectReference Include="..\Comms\MissionPlanner.Comms.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
@@ -38,14 +36,12 @@
     <ProjectReference Include="..\ICSharpCode.SharpZipLib\ICSharpCode.SharpZipLib.csproj" />
     <ProjectReference Include="..\KMLib\KMLib.csproj" />
     <ProjectReference Include="..\LibVLC.NET\LibVLC.NET.csproj" />
-    <ProjectReference Include="..\ManagedNativeWifi.Simple\ManagedNativeWifi.Simple.csproj" />
     <ProjectReference Include="..\Maps\MissionPlanner.Maps.csproj" />
     <ProjectReference Include="..\Mavlink\MAVLink.csproj" />
     <ProjectReference Include="..\MetaDataExtractorCSharp240d\MetaDataExtractor.csproj" />
     <ProjectReference Include="..\netDxf\netDxf.csproj" />
     <ProjectReference Include="..\ProjNet\ProjNET.csproj" />
     <ProjectReference Include="..\SharpKml\SharpKml.csproj" />
-    <ProjectReference Include="..\solo\solo.csproj" />
     <ProjectReference Include="..\Strings\MissionPlanner.Strings.csproj" />
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj" />
   </ItemGroup>

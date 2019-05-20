@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Xamarin"
+             xmlns:forms="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+             xmlns:controls="clr-namespace:MissionPlanner.Controls;assembly=Xamarin"
+             xmlns:GMap="clr-namespace:GMap.NET.WindowsForms;assembly=Xamarin"
+             xmlns:controls1="clr-namespace:Xamarin.Controls;assembly=Xamarin"
+             x:Class="Xamarin.FlightPlanner" SizeChanged="FlightPlanner_OnSizeChanged">
+
+
+    <forms:SKGLView x:Name="SkglView" EnableTouchEvents="True" Touch="SkglView_OnTouch" PaintSurface="SKGLView_OnPaintSurface" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="100" ></forms:SKGLView>
+  
+</ContentPage>

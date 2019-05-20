@@ -5,36 +5,67 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <Win32Resource />
+    <Language>en</Language>
     <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controls\AGauge_xam.cs" />
+    <Compile Remove="Controls\HUD_xam.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Controls\AGauge_xam.cs">
+      <SubType>UserControl</SubType>
+    </None>
+    <None Include="Controls\HUD_xam.cs">
+      <SubType>UserControl</SubType>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.1" />
+    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.DotNet.Analyzers.Compatibility" Version="0.2.12-alpha">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="SkiaSharp.Views.Forms" Version="1.68.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\ArduPilot\MissionPlanner.ArduPilot.csproj" />
     <ProjectReference Include="..\..\Comms\MissionPlanner.Comms.csproj" />
+    <ProjectReference Include="..\..\GeoUtility\GeoUtility.csproj" />
     <ProjectReference Include="..\..\GMap.NET.Core\GMap.NET.Core.csproj" />
+    <ProjectReference Include="..\..\ICSharpCode.SharpZipLib\ICSharpCode.SharpZipLib.csproj" />
     <ProjectReference Include="..\..\Mavlink\MAVLink.csproj" />
+    <ProjectReference Include="..\..\mono\mcs\class\System.Windows.Forms\System.Windows.Forms-net_4_x.csproj" />
+    <ProjectReference Include="..\..\ProjNet\ProjNET.csproj" />
     <ProjectReference Include="..\..\UAVCAN\UAVCAN.csproj" />
     <ProjectReference Include="..\..\Utilities\MissionPlanner.Utilities.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="OpenTK">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\opentk\3.0.1\lib\net20\OpenTK.dll</HintPath>
-      <SpecificVersion>false</SpecificVersion>
+    <Reference Include="Ionic.Zip.NetStandard">
+      <HintPath>..\..\Ionic.Zip.NetStandard.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK-1.0">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v2.3\OpenTK-1.0.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -42,8 +73,38 @@
     <Compile Update="Controls\AGauge.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="Controls\Coords.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\Coords.Designer.cs">
+      <DependentUpon>Coords.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\DistanceBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\DistanceBar.Designer.cs">
+      <DependentUpon>DistanceBar.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\FlightData.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\FlightData.Designer.cs">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\FlightPlanner.cs">
+      <SubType>Control</SubType>
+    </Compile>
+    <Compile Update="Controls\FlightPlanner.Designer.cs">
+      <DependentUpon>FlightPlanner.cs</DependentUpon>
+    </Compile>
     <Compile Update="Controls\GMapControl.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\HSI.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\HSI.Designer.cs">
+      <DependentUpon>HSI.cs</DependentUpon>
     </Compile>
     <Compile Update="Controls\HUD.cs">
       <SubType>UserControl</SubType>
@@ -52,6 +113,87 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>HUDT.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\ModifyandSet.cs">
+      <SubType>Control</SubType>
+    </Compile>
+    <Compile Update="Controls\ModifyandSet.Designer.cs">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\myGMAP.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\MyLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\MyProgressBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\MyProgressBar.Designer.cs">
+      <DependentUpon>MyProgressBar.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\MyTrackBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\MyUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\PreFlight\CheckListControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\PreFlight\CheckListControl.Designer.cs">
+      <DependentUpon>CheckListControl.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\PreFlight\CheckListEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Controls\PreFlight\CheckListEditor.Designer.cs">
+      <DependentUpon>CheckListEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\PreFlight\CheckListInput.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\ProgressReporterDialogue.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Controls\ProgressReporterDialogue.Designer.cs">
+      <DependentUpon>ProgressReporterDialogue.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\QuickView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\QuickView.Designer.cs">
+      <DependentUpon>QuickView.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\ServoOptions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\ServoOptions.Designer.cs">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\TilePrefetcher.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Controls\TilePrefetcher.Designer.cs">
+      <DependentUpon>TilePrefetcher.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\Tracker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\Tracker.Designer.cs">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\WindDir.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\WindDir.Designer.cs">
+      <DependentUpon>WindDir.cs</DependentUpon>
+    </Compile>
+    <Compile Update="FlightData.xaml.cs">
+      <DependentUpon>FlightData.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="FlightPlanner.xaml.cs">
+      <DependentUpon>FlightPlanner</DependentUpon>
     </Compile>
     <Compile Update="MainPage_old.xaml.cs">
       <DependentUpon>MainPage_old.xaml</DependentUpon>
@@ -73,12 +215,204 @@
     <EmbeddedResource Update="Controls\AGauge.resx">
       <DependentUpon>AGauge.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Update="Controls\AGauge_xam.resx">
+      <DependentUpon>AGauge_xam.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Coords.resx">
+      <DependentUpon>Coords.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\DistanceBar.resx">
+      <DependentUpon>DistanceBar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.ar.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.az-Latn-AZ.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.de-DE.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.es-ES.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.fr.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.id-ID.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.it-IT.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.ja-JP.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.ko-KR.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.pl.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.pt.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.ru-KZ.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.ru-RU.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.tr.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.zh-Hans.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.zh-Hant.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightData.zh-TW.resx">
+      <DependentUpon>FlightData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FlightPlanner.resx">
+      <DependentUpon>FlightPlanner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\HSI.resx">
+      <DependentUpon>HSI.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Update="Controls\HUDT.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>HUDT.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Controls\HUDT.zh-Hans.resx">
       <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.ar.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.az-Latn-AZ.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.id-ID.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.ja-JP.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.ko-KR.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.pt.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.ru-KZ.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ModifyandSet.tr.resx">
+      <DependentUpon>ModifyandSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\MyProgressBar.resx">
+      <DependentUpon>MyProgressBar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\PreFlight\CheckListEditor.resx">
+      <DependentUpon>CheckListEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\PreFlight\CheckListInput.resx">
+      <DependentUpon>CheckListInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ProgressReporterDialogue.resx">
+      <DependentUpon>ProgressReporterDialogue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ProgressReporterDialogue.zh-Hans.resx">
+      <DependentUpon>ProgressReporterDialogue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\QuickView.resx">
+      <DependentUpon>QuickView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.ar.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.az-Latn-AZ.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.id-ID.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.ja-JP.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.ko-KR.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.pt.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.ru-KZ.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.tr.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\ServoOptions.zh-Hans.resx">
+      <DependentUpon>ServoOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\TilePrefetcher.resx">
+      <DependentUpon>TilePrefetcher.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.ar.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.az-Latn-AZ.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.de-DE.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.fr.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.id-ID.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.it-IT.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.ko-KR.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.pt.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.ru-KZ.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.tr.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.zh-Hans.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.zh-Hant.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\Tracker.zh-TW.resx">
+      <DependentUpon>Tracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Controls\WindDir.resx">
+      <DependentUpon>WindDir.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MasterDetailPage1Detail.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
@@ -87,7 +421,7 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
+      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

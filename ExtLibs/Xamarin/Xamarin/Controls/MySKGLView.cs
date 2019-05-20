@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Forms;
 using MissionPlanner.Utilities;
 using MissionPlanner.Utilities.Drawing;
 using Xamarin.Forms;
@@ -13,6 +14,9 @@ using Graphics = MissionPlanner.Utilities.Drawing.Graphics;
 using Color = System.Drawing.Color;
 using Font = MissionPlanner.Utilities.Drawing.Font;
 using Image = MissionPlanner.Utilities.Drawing.Image;
+using ImageLayout = MissionPlanner.Utilities.Drawing.ImageLayout;
+using KeyEventArgs = MissionPlanner.Utilities.Drawing.KeyEventArgs;
+using MouseButtons = MissionPlanner.Utilities.Drawing.MouseButtons;
 using Rectangle = System.Drawing.Rectangle;
 using PointF = System.Drawing.PointF;
 using RectangleF = System.Drawing.RectangleF;
@@ -37,6 +41,8 @@ namespace Xamarin.Controls
         private object EventMouseUp = new object();
         private object EventMouseEnter = new object();
 
+        public string Text { get; set; }
+
         public MySKGLView() : base()
         {
             EnableTouchEvents = true;
@@ -52,6 +58,17 @@ namespace Xamarin.Controls
             base.SizeChanged += MySKGLView_SizeChanged;
 
             OnLoad(null);
+        }
+        public event MouseEventHandler MouseUp
+        {
+            add
+            {
+                Events.AddHandler(EventMouseUp, value);
+            }
+            remove
+            {
+                Events.RemoveHandler(EventMouseUp, value);
+            }
         }
 
         public event MouseEventHandler MouseDown
@@ -338,11 +355,11 @@ namespace Xamarin.Controls
         {
             var mouse = new MouseEventArgs()
             {
-                X = (int)e.Location.X,
-                Y = (int)e.Location.Y,
-                Button = e.MouseButton == SKMouseButton.Left ? MouseButtons.Left :
+                X = (int) e.Location.X,
+                Y = (int) e.Location.Y,
+                Button = (System.Windows.Forms.MouseButtons) (e.MouseButton == SKMouseButton.Left ? MouseButtons.Left :
                     e.MouseButton == SKMouseButton.Unknown ? MouseButtons.None :
-                    e.MouseButton == SKMouseButton.Right ? MouseButtons.Right : MouseButtons.Middle,
+                    e.MouseButton == SKMouseButton.Right ? MouseButtons.Right : MouseButtons.Middle),
                 Delta = 0 // mouse wheel
             };
 

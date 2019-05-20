@@ -1,25 +1,25 @@
 ﻿using Autofac;
-using Autofac.Core;
 using log4net;
 using MissionPlanner;
 using MissionPlanner.Comms;
 using MissionPlanner.Utilities;
+using MissionPlanner.Utilities.Drawing;
 using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Resources;
 using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Forms;
+using System.Windows.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
-
+using Application = Xamarin.Forms.Application;
+using Rectangle = System.Drawing.Rectangle;
+using Timer = System.Threading.Timer;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace Xamarin
 {
-   
     public partial class App : Application
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -36,6 +36,13 @@ namespace Xamarin
         public App()
         {
             InitializeComponent();
+
+            XplatUI.driver = new driver();
+
+            try
+            {
+                Settings.Instance.Load();
+            } catch { }
 
             MainPage = new MainPage();
         }

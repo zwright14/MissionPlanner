@@ -39,12 +39,13 @@
     <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <EntryPointProjectUniqueName>..\..\MissionPlanner.csproj</EntryPointProjectUniqueName>
-    <PackageCertificateThumbprint>3228C68306A69027A088D7E085EDB5DCA780BA25</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>88E657129DCEF4B87FA1EEB423E2BADCF59B6250</PackageCertificateThumbprint>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
     <AppInstallerUpdateFrequency>1</AppInstallerUpdateFrequency>
     <AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
+    <PackageCertificateKeyFile>WindowsStore_TemporaryKey.pfx</PackageCertificateKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <AppxBundle>Always</AppxBundle>
@@ -116,6 +117,7 @@
     <Content Include="Images\Wide310x150Logo.scale-150.png" />
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
     <Content Include="Images\Wide310x150Logo.scale-400.png" />
+    <None Include="WindowsStore_TemporaryKey.pfx" />
     <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>

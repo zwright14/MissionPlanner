@@ -33,9 +33,9 @@ namespace Xamarin
             {
                 MenuItems = new ObservableCollection<MasterDetailPage1MenuItem>(new[]
                 {
-                    new MasterDetailPage1MenuItem { Id = 0, Title = "FlightData", TargetType = typeof(MainPage_old) },
-                    new MasterDetailPage1MenuItem { Id = 1, Title = "FlightPlanner", TargetType = typeof(MasterDetailPage1Detail)  },
-                    new MasterDetailPage1MenuItem { Id = 2, Title = "Initial Setup", TargetType = typeof(MasterDetailPage1Detail)  },
+                    new MasterDetailPage1MenuItem { Id = 0, Title = "FlightData", TargetType = typeof(FlightData) },
+                    new MasterDetailPage1MenuItem { Id = 1, Title = "FlightPlanner", TargetType = typeof(FlightPlanner)  },
+                    new MasterDetailPage1MenuItem { Id = 2, Title = "Initial Setup", TargetType = typeof(MainPage_old)  },
                     new MasterDetailPage1MenuItem { Id = 3, Title = "Configuration", TargetType = typeof(MasterDetailPage1Detail)  },
                     new MasterDetailPage1MenuItem { Id = 4, Title = "Simulation", TargetType = typeof(MasterDetailPage1Detail)  },
                 });

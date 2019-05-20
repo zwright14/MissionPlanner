@@ -430,19 +430,19 @@ GRBackendRenderTargetDesc backendRenderTargetDescription = new GRBackendRenderTa
             GraphicsUnit graphicsUnit, ImageAttributes tileFlipXYAttributes)
         {
             var coltype = SKColorType.Bgra8888;
-            ((Bitmap)img).MakeTransparent(Color.Transparent);
+            ((Bitmap) img).MakeTransparent(Color.Transparent);
             var data = ((Bitmap) img).LockBits(new Rectangle(0, 0, img.Width, img.Height),
                 ImageLockMode.ReadOnly,
                 SKColorType.Bgra8888);
 
-            if(CompositingMode == CompositingMode.SourceOver)
+            if (CompositingMode == CompositingMode.SourceOver)
                 _paint.BlendMode = SKBlendMode.SrcOver;
             if (CompositingMode == CompositingMode.SourceCopy)
                 _paint.BlendMode = SKBlendMode.Src;
             //if(img.PixelFormat == PixelFormat.Format32bppArgb)
-               _paint.Color = SKColors.Black;
+            _paint.Color = SKColors.Black;
 
-               
+
 
 
             var imginfo = new SKImageInfo(img.Width, img.Height, coltype, SKAlphaType.Premul);
@@ -453,10 +453,15 @@ GRBackendRenderTargetDesc backendRenderTargetDescription = new GRBackendRenderTa
 
             if (image == null)
                 return;
+            try
+            {
+            
 
             _image.DrawImage(image, new SKRect(srcX, srcY, srcX + srcWidth, srcY + srcHeight),
                 new SKRect(rectangle.X, rectangle.Y, rectangle.Right, rectangle.Bottom), _paint);
-            ((Bitmap)img).UnlockBits(data);
+        } catch { }
+
+        ((Bitmap)img).UnlockBits(data);
             data = null;
 
             return;

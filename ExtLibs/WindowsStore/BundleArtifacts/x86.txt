@@ -1,0 +1,2 @@
+MainPackage=C:\Users\mich1\Desktop\Hex\MissionPlanner\ExtLibs\WindowsStore\bin\x86\Debug\WindowsStore_1.3.66.0_x86_Debug.appx
+SymbolPackage=C:\Users\mich1\Desktop\Hex\MissionPlanner\ExtLibs\WindowsStore\AppPackages\WindowsStore_1.3.66.0_Debug_Test\WindowsStore_1.3.66.0_x86_Debug.appxsym

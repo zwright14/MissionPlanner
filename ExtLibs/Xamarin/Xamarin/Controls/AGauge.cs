@@ -17,28 +17,23 @@
 //  3. This notice may not be removed or altered from any source distribution.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Drawing.Drawing2D;
+using System.Diagnostics;
+using MissionPlanner.Controls;
 using MissionPlanner.Utilities.Drawing;
-using Xamarin.Controls;
-using Bitmap = MissionPlanner.Utilities.Drawing.Bitmap;
-using Brush = MissionPlanner.Utilities.Drawing.Brush;
-using Brushes = MissionPlanner.Utilities.Drawing.Brushes;
-using Graphics = MissionPlanner.Utilities.Drawing.Graphics;
-using Pen = MissionPlanner.Utilities.Drawing.Pen;
-using Pens = MissionPlanner.Utilities.Drawing.Pens;
-using SolidBrush = MissionPlanner.Utilities.Drawing.SolidBrush;
-using StringFormat = MissionPlanner.Utilities.Drawing.StringFormat;
-using SystemColors = MissionPlanner.Utilities.Drawing.SystemColors;
-using Color = System.Drawing.Color;
-using Rectangle = System.Drawing.Rectangle;
-using PointF = System.Drawing.PointF;
-using RectangleF = System.Drawing.RectangleF;
-using Point = System.Drawing.Point;
-using Size = System.Drawing.Size;
-using SizeF = System.Drawing.SizeF;
-namespace MissionPlanner.Controls
+using ControlStyles = System.Windows.Forms.ControlStyles;
+using ImageLayout = System.Windows.Forms.ImageLayout;
+
+namespace AGaugeApp
 {
-    public partial class AGauge : MySKGLView
+  
+    public partial class AGauge : MyUserControl
     {
 #region enum, var, delegate, event
         public enum NeedleColorEnum
@@ -203,7 +198,7 @@ namespace MissionPlanner.Controls
                 Refresh();
             }
         }
-        public override ImageLayout BackgroundImageLayout
+        public override System.Windows.Forms.ImageLayout BackgroundImageLayout
         {
             get
             {
@@ -1484,6 +1479,8 @@ System.ComponentModel.Description("Enables or disables the range selected by Nee
         /// </summary>
         public new void Invalidate()
         {
+     
+
             base.Invalidate();
         }
 
@@ -1503,6 +1500,8 @@ System.ComponentModel.Description("Enables or disables the range selected by Nee
             {
                 return;
             }
+
+    
 
             float scale = 1;
 
@@ -2013,7 +2012,7 @@ System.ComponentModel.Description("Enables or disables the range selected by Nee
             // AGauge
             // 
             this.BackColor = System.Drawing.Color.Transparent;
-            this.BackgroundImageLayout = ImageLayout.Zoom;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.DoubleBuffered = true;
             this.Name = "AGauge";
             this.ResumeLayout(false);

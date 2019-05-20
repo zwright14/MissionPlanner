@@ -130,7 +130,7 @@ namespace MissionPlanner.Utilities
                     //client.NoDelay = true;
 
                     // makesure we have valid image
-                    GCSViews.FlightData.myhud.streamjpgenable = true;
+                    //GCSViews.FlightData.myhud.streamjpgenable = true;
 
                     NetworkStream stream = client.GetStream();
 
