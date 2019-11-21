@@ -939,6 +939,21 @@ namespace MissionPlanner.Log
                 }
             }
 
+            fieldmatchs = Regex.Matches(expression, @"([\(,]*([A-Z0-9]{3,4})[\),])");
+
+            if (fieldmatchs.Count > 0)
+            {
+                foreach (Match match in fieldmatchs)
+                {
+                    var type = match.Groups[2].Value.ToString();
+
+                    if (!fieldsUsed.ContainsKey(type))
+                        fieldsUsed[type] = new List<string>();
+
+                    dflog.logformat[type].FieldNames.ForEach(a => fieldsUsed[type].Add(a));
+                }
+            }
+
             foreach (var logformatKey in dflog.logformat.Keys)
             {
                 var ans = new Dictionary<string, object>();

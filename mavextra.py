@@ -374,7 +374,7 @@ def mag_roll(RAW_IMU, inclination, declination):
     (r, p, y) = m.to_euler()
     return degrees(r)
 
-def expected_mag(RAW_IMU, ATTITUDE, inclination, declination):
+def expected_mag(RAW_IMU, ATTITUDE, inclination=0, declination=0):
     '''return expected mag vector'''
     m_body = Vector3(RAW_IMU.xmag, RAW_IMU.ymag, RAW_IMU.zmag)
     field_strength = m_body.length()
