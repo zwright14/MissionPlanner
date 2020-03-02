@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: wix
-        run: choco  --yes install wixtoolset
+        run: choco install wixtoolset
 
       - uses: actions/checkout@v1
 
