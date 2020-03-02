@@ -32,7 +32,7 @@ jobs:
       - name: msi
         run: |
           cd D:/a/MissionPlanner/MissionPlanner/msi
-          wix.exe ..\bin\release\net461\
+          ./wix.exe ..\bin\release\net461\
           &"${Env:wix}\bin\candle" installer.wxs -ext WiXNetFxExtension -ext WixDifxAppExtension -ext WixUIExtension.dll -ext WixUtilExtension -ext WixIisExtension 
           &"${Env:wix}\bin\light" installer.wixobj "%wix%\bin\difxapp_x86.wixlib" -sval -o MissionPlanner-latest.msi -ext WiXNetFxExtension -ext WixDifxAppExtension -ext WixUIExtension.dll -ext WixUtilExtension -ext WixIisExtension 
       - uses: actions/upload-artifact@v1
