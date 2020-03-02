@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: wix
-        run: choco install wixtoolset
+        run: rem choco install wixtoolset
 
       - uses: actions/checkout@v1
 
@@ -31,10 +31,11 @@ jobs:
           path: bin\Release\net461
       - name: msi
         run: |
-          cd D:/a/MissionPlanner/MissionPlanner/msi
+          pwd
+          cd msi
           ./wix.exe ..\bin\release\net461\
           &"${Env:wix}\bin\candle" installer.wxs -ext WiXNetFxExtension -ext WixDifxAppExtension -ext WixUIExtension.dll -ext WixUtilExtension -ext WixIisExtension 
-          &"${Env:wix}\bin\light" installer.wixobj "%wix%\bin\difxapp_x86.wixlib" -sval -o MissionPlanner-latest.msi -ext WiXNetFxExtension -ext WixDifxAppExtension -ext WixUIExtension.dll -ext WixUtilExtension -ext WixIisExtension 
+          &"${Env:wix}\bin\light" installer.wixobj "${Env:wix}\bin\difxapp_x86.wixlib" -sval -o MissionPlanner-latest.msi -ext WiXNetFxExtension -ext WixDifxAppExtension -ext WixUIExtension.dll -ext WixUtilExtension -ext WixIisExtension 
       - uses: actions/upload-artifact@v1
         with:
           name: MissionPlannerBetaMSI
