@@ -5,6 +5,12 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     <Deterministic>false</Deterministic><StartupObject>MissionPlanner.Program</StartupObject><ApplicationIcon /><RootNamespace>MissionPlanner</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
   </PropertyGroup>  <ItemGroup>
     <Compile Remove="APMPlannerXplanes\**" />
     <Compile Remove="Msi\**" />
@@ -49,7 +55,7 @@
    <PackageReference Include="SkiaSharp.Views.Forms.WinForms" Version="1.60.1-alpha2" />
    <PackageReference Include="SkiaSharp.Views.WindowsForms" Version="1.68.1.1" />
    <PackageReference Include="System.Resources.Extensions" Version="4.6.0" />
-   <PackageReference Include="Xamarin.Forms" Version="4.4.0.991265" />
+   <PackageReference Include="Xamarin.Forms" Version="4.5.0.356" />
    <PackageReference Include="Xamarin.Forms.Platform.WinForms" Version="3.4.0-alpha" />
     <Reference Include="BitMiracle.LibTiff.NetStandard">
       <HintPath>.\extlibs\BitMiracle.LibTiff.NetStandard.dll</HintPath>

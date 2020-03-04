@@ -1353,7 +1353,7 @@ mc:Ignorable=""d""
 
             try
             {
-                var serializer = new XmlSerializer(typeof(T));
+                var serializer = new XmlSerializer(typeof(T), new[] {typeof(XmlColor)});
                 reader = new StreamReader(filePath);
                 return (T)serializer.Deserialize(reader);
             }
