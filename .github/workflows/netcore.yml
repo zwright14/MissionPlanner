@@ -19,11 +19,11 @@ jobs:
       - name: Cleanup
         shell: pwsh
         run: |
-          cd bin\Release\net461
+          cd bin\Release\netcoreapp3.1
           gci plugins | ForEach-Object {                 if (Test-Path $_.Name -PathType Leaf)                {                    Write-Host "Remove" $_.FullName   ;                 Remove-Item $_.FullName                            } else {                    Write-Host $_.Name                }            }
           
       - uses: actions/upload-artifact@v1
         with:
           name: MissionPlannerBeta
-          path: bin\Release\net461
+          path: bin\Release\netcoreapp3.1
   
